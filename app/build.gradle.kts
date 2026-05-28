@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace = "com.rashidyusubov.musicapp"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.rashidyusubov.musicapp"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
