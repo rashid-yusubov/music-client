@@ -1,27 +1,39 @@
 package com.rashidyusubov.musicapp.presentation.navigation
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.LibraryMusic
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.ui.graphics.vector.ImageVector
+
 sealed class BottomNavItem(
     val route: String,
-    val title: String
+    val title: String,
+    val icon: ImageVector
 ) {
 
     data object Home : BottomNavItem(
         route = "home",
-        title = "Главная"
+        title = "Главная",
+        icon = Icons.Outlined.Home
     )
 
     data object Library : BottomNavItem(
         route = "library",
-        title = "Библиотека"
+        title = "Библиотека",
+        icon = Icons.Outlined.LibraryMusic
     )
 
     data object Search : BottomNavItem(
         route = "search",
-        title = "Поиск"
+        title = "Поиск",
+        icon = Icons.Outlined.Search
     )
 
     data object Profile : BottomNavItem(
         route = "profile",
-        title = "Профиль"
+        title = "Профиль",
+        icon = Icons.Outlined.Person
     )
 }

@@ -1,6 +1,9 @@
 package com.rashidyusubov.musicapp.presentation.navigation
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -14,25 +17,33 @@ fun MainNavigation() {
 
     val navController = rememberNavController()
 
-    NavHost(
-        navController = navController,
-        startDestination = BottomNavItem.Home.route
-    ) {
-
-        composable(BottomNavItem.Home.route) {
-            HomeScreen()
+    Scaffold(
+        bottomBar = {
+            BottomBar(navController)
         }
+    ) { innerPadding ->
 
-        composable(BottomNavItem.Library.route) {
-            LibraryScreen()
-        }
+        NavHost(
+            navController = navController,
+            startDestination = BottomNavItem.Home.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
 
-        composable(BottomNavItem.Search.route) {
-            SearchScreen()
-        }
+            composable(BottomNavItem.Home.route) {
+                HomeScreen()
+            }
 
-        composable(BottomNavItem.Profile.route) {
-            ProfileScreen()
+            composable(BottomNavItem.Library.route) {
+                LibraryScreen()
+            }
+
+            composable(BottomNavItem.Search.route) {
+                SearchScreen()
+            }
+
+            composable(BottomNavItem.Profile.route) {
+                ProfileScreen()
+            }
         }
     }
 }

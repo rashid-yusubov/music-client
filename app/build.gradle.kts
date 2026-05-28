@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.ui)
+    implementation(libs.material.icons.extended)
 }
 
 kotlin {
