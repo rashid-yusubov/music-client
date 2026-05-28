@@ -36,4 +36,16 @@ sealed class BottomNavItem(
         title = "Профиль",
         icon = Icons.Outlined.Person
     )
+
+    data object Login : BottomNavItem(
+        route = "login",
+        title = "Login",
+        icon = Icons.Outlined.Person
+    )
+
+    data object Register : BottomNavItem(
+        route = "register",
+        title = "Register",
+        icon = Icons.Outlined.Person
+    )
 }
