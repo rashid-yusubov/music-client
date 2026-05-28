@@ -13,5 +13,7 @@ data class SearchUiState(
 
     val history: List<SearchHistoryEntity> = emptyList(),
 
+    val hasSearched: Boolean = false,
+
     val error: String? = null
 )

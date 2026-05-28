@@ -103,10 +103,16 @@ fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
 
         state.error?.let {
 
-            Column {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
 
                 Text(
-                    text = "Ошибка поиска"
+                    text = "Ошибка подключения"
+                )
+
+                Text(
+                    text = "Не удалось получить данные с сервера"
                 )
 
                 Button(
@@ -115,19 +121,32 @@ fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
                     }
                 ) {
 
-                    Text("Обновить")
+                    Text(
+                        text = "Обновить"
+                    )
                 }
             }
         }
 
         if (
+            state.hasSearched &&
             state.tracks.isEmpty() &&
-            state.query.isNotBlank() &&
             !state.isLoading &&
             state.error == null
         ) {
 
-            Text(text = "Ничего не найдено")
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+
+                Text(
+                    text = "Ничего не найдено"
+                )
+
+                Text(
+                    text = "Попробуйте изменить поисковый запрос"
+                )
+            }
         }
 
         if (
