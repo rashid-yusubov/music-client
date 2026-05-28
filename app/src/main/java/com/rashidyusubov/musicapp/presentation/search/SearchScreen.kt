@@ -21,17 +21,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-
+import androidx.hilt.navigation.compose.hiltViewModel
 @Composable
-fun SearchScreen(
-    viewModel: SearchViewModel = viewModel()
-) {
+fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
 
     val state by viewModel.state.collectAsState()
 
-    val keyboardController =
-        LocalSoftwareKeyboardController.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     Column(
         modifier = Modifier
@@ -83,7 +79,7 @@ fun SearchScreen(
 
                 keyboardController?.hide()
 
-                viewModel.fakeSearch()
+                viewModel.search()
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -94,6 +90,25 @@ fun SearchScreen(
         if (state.isLoading) {
 
             CircularProgressIndicator()
+        }
+
+        state.error?.let {
+
+            Column {
+
+                Text(
+                    text = "Ошибка поиска"
+                )
+
+                Button(
+                    onClick = {
+                        viewModel.retry()
+                    }
+                ) {
+
+                    Text("Обновить")
+                }
+            }
         }
 
         if (
@@ -116,7 +131,9 @@ fun SearchScreen(
                         .padding(16.dp)
                 ) {
 
-                    Text(text = track)
+                    Text(
+                        text = track.title
+                    )
                 }
             }
         }

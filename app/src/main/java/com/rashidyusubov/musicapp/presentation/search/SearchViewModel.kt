@@ -1,16 +1,26 @@
 package com.rashidyusubov.musicapp.presentation.search
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.rashidyusubov.musicapp.domain.usecase.SearchTracksUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchViewModel : ViewModel() {
+@HiltViewModel
+class SearchViewModel @Inject constructor(
+    private val searchTracksUseCase: SearchTracksUseCase
+) : ViewModel() {
 
     private val _state =
         MutableStateFlow(SearchUiState())
 
     val state =
         _state.asStateFlow()
+
+    private var lastQuery = ""
 
     fun updateQuery(query: String) {
 
@@ -24,28 +34,55 @@ class SearchViewModel : ViewModel() {
 
         _state.value =
             _state.value.copy(
-                query = ""
+                query = "",
+                tracks = emptyList(),
+                error = null
             )
     }
 
-    fun fakeSearch() {
+    fun search() {
 
-        if (_state.value.query.isBlank()) return
+        val query = _state.value.query
 
-        _state.value =
-            _state.value.copy(
-                isLoading = true
-            )
+        if (query.isBlank()) return
 
-        _state.value =
-            _state.value.copy(
-                isLoading = false,
+        lastQuery = query
 
-                tracks = listOf(
-                    "Mock Track 1",
-                    "Mock Track 2",
-                    "Mock Track 3"
-                )
-            )
+        viewModelScope.launch {
+
+            try {
+
+                _state.value =
+                    _state.value.copy(
+                        isLoading = true,
+                        error = null
+                    )
+
+                val tracks =
+                    searchTracksUseCase(query)
+
+                _state.value =
+                    _state.value.copy(
+                        isLoading = false,
+                        tracks = tracks
+                    )
+
+            } catch (e: Exception) {
+
+                _state.value =
+                    _state.value.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+            }
+        }
+    }
+
+    fun retry() {
+
+        if (lastQuery.isNotBlank()) {
+
+            search()
+        }
     }
 }
