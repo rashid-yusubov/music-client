@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.rashidyusubov.musicapp.presentation.navigation.MainNavigation
 import com.rashidyusubov.musicapp.ui.theme.MusicTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -18,7 +19,7 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             MusicTheme {
-
+                MainNavigation()
             }
         }
     }
