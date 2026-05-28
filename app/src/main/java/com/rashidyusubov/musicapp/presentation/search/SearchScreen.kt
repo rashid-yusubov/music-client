@@ -21,11 +21,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.hilt.navigation.compose.hiltViewModel
 @Composable
 fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
 
     val state by viewModel.state.collectAsState()
+
+    var searchFocused by remember { mutableStateOf(false)
+    }
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -44,7 +48,12 @@ fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
                 viewModel.updateQuery(it)
             },
 
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged {
+
+                    searchFocused = it.isFocused
+                },
 
             placeholder = {
                 Text(text = "Поиск треков")
@@ -114,10 +123,57 @@ fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
         if (
             state.tracks.isEmpty() &&
             state.query.isNotBlank() &&
-            !state.isLoading
+            !state.isLoading &&
+            state.error == null
         ) {
 
             Text(text = "Ничего не найдено")
+        }
+
+        if (
+            searchFocused &&
+            state.history.isNotEmpty()
+        ) {
+
+            Text(
+                text = "История поиска"
+            )
+
+            state.history.forEach { item ->
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+
+                            viewModel.searchFromHistory(
+                                item.title
+                            )
+
+                            searchFocused = false
+
+                            keyboardController?.hide()
+                        }
+                        .padding(12.dp)
+                ) {
+
+                    Text(
+                        text = item.title
+                    )
+                }
+            }
+
+            Button(
+                onClick = {
+
+                    viewModel.clearHistory()
+                }
+            ) {
+
+                Text(
+                    text = "Очистить историю"
+                )
+            }
         }
 
         LazyColumn {
@@ -127,7 +183,11 @@ fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { }
+                        .clickable {
+                            viewModel.saveTrackToHistory(track)
+                            searchFocused = false
+                            keyboardController?.hide()
+                        }
                         .padding(16.dp)
                 ) {
 

@@ -2,6 +2,8 @@ package com.rashidyusubov.musicapp.presentation.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rashidyusubov.musicapp.domain.model.Track
+import com.rashidyusubov.musicapp.domain.repository.SearchHistoryRepository
 import com.rashidyusubov.musicapp.domain.usecase.SearchTracksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,16 +13,21 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val searchTracksUseCase: SearchTracksUseCase
+    private val searchTracksUseCase: SearchTracksUseCase,
+    private val historyRepository: SearchHistoryRepository
 ) : ViewModel() {
 
-    private val _state =
-        MutableStateFlow(SearchUiState())
+    private val _state = MutableStateFlow(
+        SearchUiState()
+    )
 
-    val state =
-        _state.asStateFlow()
+    val state = _state.asStateFlow()
 
     private var lastQuery = ""
+
+    init {
+        loadHistory()
+    }
 
     fun updateQuery(query: String) {
 
@@ -84,5 +91,50 @@ class SearchViewModel @Inject constructor(
 
             search()
         }
+    }
+
+    private fun loadHistory() {
+
+        viewModelScope.launch {
+
+            _state.value =
+                _state.value.copy(
+                    history = historyRepository.getHistory()
+                )
+        }
+    }
+
+    fun clearHistory() {
+
+        viewModelScope.launch {
+
+            historyRepository.clearHistory()
+
+            loadHistory()
+        }
+    }
+
+    fun saveTrackToHistory(
+        track: Track
+    ) {
+
+        viewModelScope.launch {
+
+            historyRepository.saveTrack(
+                trackId = track.id,
+                title = track.title
+            )
+
+            loadHistory()
+        }
+    }
+
+    fun searchFromHistory(
+        query: String
+    ) {
+
+        updateQuery(query)
+
+        search()
     }
 }

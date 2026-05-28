@@ -2,7 +2,9 @@ package com.rashidyusubov.musicapp.di
 
 import com.rashidyusubov.musicapp.data.remote.api.TracksApi
 import com.rashidyusubov.musicapp.data.remote.api.TracksApiImpl
+import com.rashidyusubov.musicapp.data.repository.SearchHistoryRepositoryImpl
 import com.rashidyusubov.musicapp.data.repository.TracksRepositoryImpl
+import com.rashidyusubov.musicapp.domain.repository.SearchHistoryRepository
 import com.rashidyusubov.musicapp.domain.repository.TracksRepository
 import dagger.Binds
 import dagger.Module
@@ -18,4 +20,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindTracksApi(api: TracksApiImpl): TracksApi
+
+    @Binds
+    abstract fun bindSearchHistoryRepository(repository: SearchHistoryRepositoryImpl): SearchHistoryRepository
 }
