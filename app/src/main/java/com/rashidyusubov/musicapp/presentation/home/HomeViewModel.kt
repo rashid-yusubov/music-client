@@ -2,6 +2,7 @@ package com.rashidyusubov.musicapp.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rashidyusubov.musicapp.domain.usecase.GetAlbumsUseCase
 import com.rashidyusubov.musicapp.domain.usecase.GetAllTracksUseCase
 import com.rashidyusubov.musicapp.domain.usecase.GetArtistsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,8 +14,9 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getArtistsUseCase: GetArtistsUseCase,
+    private val getAlbumsUseCase: GetAlbumsUseCase,
     private val getAllTracksUseCase: GetAllTracksUseCase
-) : ViewModel() {
+    ) : ViewModel() {
 
     private val _state =
         MutableStateFlow(
@@ -46,10 +48,14 @@ class HomeViewModel @Inject constructor(
                 val artists =
                     getArtistsUseCase()
 
+                val albums =
+                    getAlbumsUseCase()
+
                 _state.value =
                     _state.value.copy(
                         tracks = tracks,
                         artists = artists,
+                        albums = albums,
                         isLoading = false
                     )
 
