@@ -1,12 +1,8 @@
 package com.rashidyusubov.musicapp.presentation.track
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,10 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 
 @Composable
-fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltViewModel()
-) {
+fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltViewModel()) {
 
     val state by viewModel.state.collectAsState()
 
@@ -28,26 +24,56 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
         viewModel.loadTrack(trackId)
     }
 
-    val track = state.track
-
-    if (track == null) {
+    if (state.isLoading) {
 
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
 
-            Text("Загрузка...")
+            CircularProgressIndicator()
         }
 
         return
     }
+
+    state.error?.let {
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+
+            Text(
+                text = "Ошибка загрузки трека"
+            )
+        }
+
+        return
+    }
+
+    val track = state.track ?: return
+
+    val minutes = track.duration / 60
+    val seconds = track.duration % 60
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp)
     ) {
+
+        AsyncImage(
+            model = track.coverUrl,
+            contentDescription = track.title,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp)
+        )
+
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
 
         Text(
             text = track.title
@@ -62,7 +88,10 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
         )
 
         Text(
-            text = "Длительность: ${track.duration}"
+            text = "Длительность: %d:%02d".format(
+                minutes,
+                seconds
+            )
         )
 
         Spacer(
