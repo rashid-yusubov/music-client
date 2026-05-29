@@ -75,6 +75,9 @@ fun HomeScreen(
                 artist = artist,
                 onClick = {
 
+                    navController.navigate(
+                        "artist/${artist.id}"
+                    )
                 }
             )
         }
