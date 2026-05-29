@@ -1,7 +1,9 @@
 package com.rashidyusubov.musicapp.data.remote.api
 
 import com.rashidyusubov.musicapp.core.network.BASE_URL
+import com.rashidyusubov.musicapp.data.remote.dto.AlbumDto
 import com.rashidyusubov.musicapp.data.remote.dto.ArtistDto
+import com.rashidyusubov.musicapp.data.remote.dto.TrackDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -19,4 +21,14 @@ class ArtistsApiImpl @Inject constructor(
     override suspend fun getArtistById(id: Int): ArtistDto {
 
         return client.get("${BASE_URL}artists/$id").body() }
+
+    override suspend fun getArtistTracks(id: Int): List<TrackDto> {
+
+        return client.get("${BASE_URL}artists/$id/tracks").body()
+    }
+
+    override suspend fun getArtistAlbums(id: Int): List<AlbumDto> {
+
+        return client.get("${BASE_URL}artists/$id/albums").body()
+    }
 }
