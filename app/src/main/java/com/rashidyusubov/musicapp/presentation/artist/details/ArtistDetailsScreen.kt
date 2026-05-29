@@ -19,6 +19,7 @@ import com.rashidyusubov.musicapp.presentation.components.TrackItem
 fun ArtistDetailsScreen(
     artistId: Int,
     onTrackClick: (Int) -> Unit,
+    onAlbumClick: (Int) -> Unit,
     viewModel: ArtistDetailsViewModel = hiltViewModel()
 ) {
 
@@ -112,6 +113,9 @@ fun ArtistDetailsScreen(
                 album = album,
                 onClick = {
 
+                    onAlbumClick(
+                        album.id
+                    )
                 }
             )
         }

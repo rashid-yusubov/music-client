@@ -149,19 +149,8 @@ fun MainNavigation() {
                         ?.getString("artistId")
                         ?.toIntOrNull()
                         ?: 0
-
-                ArtistDetailsScreen(
-
-                    artistId = artistId,
-
-                    onTrackClick = { trackId ->
-
-                        navController.navigate(
-                            "track/$trackId"
-                        )
-                    }
-                )
             }
+            
             composable(
                 route = "track/{trackId}"
             ) {
@@ -190,6 +179,13 @@ fun MainNavigation() {
                 ArtistDetailsScreen(
 
                     artistId = artistId,
+
+                    onAlbumClick = { albumId ->
+
+                        navController.navigate(
+                            "album/$albumId"
+                        )
+                    },
 
                     onTrackClick = { trackId ->
 
