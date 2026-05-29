@@ -8,23 +8,15 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import javax.inject.Inject
 
-class TracksApiImpl @Inject constructor(
-    private val client: HttpClient
-) : TracksApi {
+class TracksApiImpl @Inject constructor(private val client: HttpClient) : TracksApi {
 
-    override suspend fun searchTracks(
-        query: String
-    ): List<TrackDto> {
+    override suspend fun searchTracks(query: String): List<TrackDto> {
 
-        return client.get(
-            "$BASE_URL/tracks/search"
-        ) {
+        return client.get("$BASE_URL/tracks/search") { parameter("query", query) }.body()
+    }
 
-            parameter(
-                "query",
-                query
-            )
+    override suspend fun getAllTracks(): List<TrackDto> {
 
-        }.body()
+        return client.get("$BASE_URL/tracks").body()
     }
 }

@@ -5,4 +5,6 @@ import com.rashidyusubov.musicapp.data.remote.dto.TrackDto
 interface TracksApi {
 
     suspend fun searchTracks(query: String): List<TrackDto>
+
+    suspend fun getAllTracks(): List<TrackDto>
 }
