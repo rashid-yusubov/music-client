@@ -31,4 +31,14 @@ class AudioPlayerManager(context: Context) {
     fun release() {
         player.release()
     }
+
+    fun currentPosition(): Long {
+
+        return player.currentPosition
+    }
+
+    fun duration(): Long {
+
+        return player.duration
+    }
 }

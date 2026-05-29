@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 
 @Composable
 fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltViewModel()) {
@@ -70,6 +71,14 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
         AudioPlayerManager(context)
     }
 
+    var isPlaying by remember {
+        mutableStateOf(false)
+    }
+
+    var currentPosition by remember {
+        mutableStateOf(0L)
+    }
+
     DisposableEffect(Unit) {
 
         onDispose {
@@ -78,12 +87,23 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
         }
     }
 
+    LaunchedEffect(isPlaying) {
+
+        while (isPlaying) {
+
+            currentPosition =
+                player.currentPosition()
+
+            delay(500)
+        }
+    }
+
     val minutes = track.duration / 60
     val seconds = track.duration % 60
 
-    var isPlaying by remember {
-        mutableStateOf(false)
-    }
+    val progress = if (player.duration() > 0) currentPosition.toFloat() / player.duration().toFloat()
+
+        else 0f
 
     Column(
         modifier = Modifier
@@ -124,7 +144,7 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
         )
 
         LinearProgressIndicator(
-            progress = { 0f },
+            progress = { progress },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -139,7 +159,12 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
                 Arrangement.SpaceBetween
         ) {
 
-            Text("0:00")
+            Text(
+                "%d:%02d".format(
+                    currentPosition / 60000,
+                    (currentPosition / 1000) % 60
+                )
+            )
 
             Text(
                 "%d:%02d".format(
