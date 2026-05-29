@@ -18,6 +18,10 @@ import com.rashidyusubov.musicapp.presentation.player.AudioPlayerManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.rashidyusubov.musicapp.core.network.BASE_URL
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 
 @Composable
 fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltViewModel()) {
@@ -77,10 +81,16 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
     val minutes = track.duration / 60
     val seconds = track.duration % 60
 
+    var isPlaying by remember {
+        mutableStateOf(false)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp)
+            .padding(24.dp),
+
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         AsyncImage(
@@ -88,47 +98,88 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
             contentDescription = track.title,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(250.dp)
-        )
-
-        Spacer(
-            modifier = Modifier.height(16.dp)
-        )
-
-        Text(
-            text = track.title
-        )
-
-        Spacer(
-            modifier = Modifier.height(16.dp)
-        )
-
-        Text(
-            text = "Жанр: ${track.genre}"
-        )
-
-        Text(
-            text = "Длительность: %d:%02d".format(
-                minutes,
-                seconds
-            )
+                .height(320.dp)
         )
 
         Spacer(
             modifier = Modifier.height(24.dp)
         )
 
+        Text(
+            text = track.title,
+            style = MaterialTheme.typography.headlineSmall
+        )
+
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
+
+        Text(
+            text = track.genre,
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        Spacer(
+            modifier = Modifier.height(24.dp)
+        )
+
+        LinearProgressIndicator(
+            progress = { 0f },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+
+            horizontalArrangement =
+                Arrangement.SpaceBetween
+        ) {
+
+            Text("0:00")
+
+            Text(
+                "%d:%02d".format(
+                    minutes,
+                    seconds
+                )
+            )
+        }
+
+        Spacer(
+            modifier = Modifier.height(32.dp)
+        )
+
         Button(
             onClick = {
 
-                player.play(
-                    BASE_URL + track.audioUrl
-                )
+                if (isPlaying) {
+
+                    player.pause()
+
+                    isPlaying = false
+
+                } else {
+
+                    player.play(
+                        BASE_URL +
+                                track.audioUrl.removePrefix("/")
+                    )
+
+                    isPlaying = true
+                }
             }
         ) {
 
             Text(
-                text = "Воспроизвести"
+                text =
+                    if (isPlaying)
+                        "⏸ Пауза"
+                    else
+                        "▶ Воспроизвести"
             )
         }
     }

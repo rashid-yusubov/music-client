@@ -18,6 +18,16 @@ class AudioPlayerManager(context: Context) {
         player.pause()
     }
 
+    fun resume() {
+
+        player.play()
+    }
+
+    fun isPlaying(): Boolean {
+
+        return player.isPlaying
+    }
+
     fun release() {
         player.release()
     }
