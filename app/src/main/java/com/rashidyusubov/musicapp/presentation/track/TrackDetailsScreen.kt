@@ -11,8 +11,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalContext
+import com.rashidyusubov.musicapp.presentation.player.AudioPlayerManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.rashidyusubov.musicapp.core.network.BASE_URL
 
 @Composable
 fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltViewModel()) {
@@ -53,6 +58,21 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
     }
 
     val track = state.track ?: return
+
+    val context = LocalContext.current
+
+    val player = remember {
+
+        AudioPlayerManager(context)
+    }
+
+    DisposableEffect(Unit) {
+
+        onDispose {
+
+            player.release()
+        }
+    }
 
     val minutes = track.duration / 60
     val seconds = track.duration % 60
@@ -101,6 +121,9 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
         Button(
             onClick = {
 
+                player.play(
+                    BASE_URL + track.audioUrl
+                )
             }
         ) {
 
