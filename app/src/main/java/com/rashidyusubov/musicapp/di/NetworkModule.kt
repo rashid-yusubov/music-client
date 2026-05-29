@@ -1,5 +1,6 @@
 package com.rashidyusubov.musicapp.di
 
+import com.rashidyusubov.musicapp.data.remote.auth.FirebaseTokenProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +20,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHttpClient(): HttpClient {
+    fun provideHttpClient(tokenProvider: FirebaseTokenProvider): HttpClient {
 
         return HttpClient(OkHttp) {
 

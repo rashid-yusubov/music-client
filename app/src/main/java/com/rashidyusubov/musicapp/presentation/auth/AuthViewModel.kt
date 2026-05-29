@@ -53,7 +53,7 @@ class AuthViewModel @Inject constructor(private val client: HttpClient) : ViewMo
                         isLoading = false,
                         isAuthorized = true
                     )
-                
+
             } catch (e: Exception) {
 
                 _state.value =

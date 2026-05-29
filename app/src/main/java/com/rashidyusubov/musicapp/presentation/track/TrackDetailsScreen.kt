@@ -207,5 +207,21 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
                         "▶ Воспроизвести"
             )
         }
+
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
+
+        Button(
+            onClick = {
+
+                viewModel.addToFavorites()
+            }
+        ) {
+
+            Text(
+                text = "❤️ В избранное"
+            )
+        }
     }
 }

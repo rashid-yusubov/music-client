@@ -9,4 +9,10 @@ interface TracksRepository {
     suspend fun getAllTracks(): List<Track>
 
     suspend fun getTrackById(id: Int): Track
+
+    suspend fun getFavorites(): List<Track>
+
+    suspend fun addToFavorites(trackId: Int)
+
+    suspend fun removeFromFavorites(trackId: Int)
 }
