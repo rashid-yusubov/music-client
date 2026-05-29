@@ -23,6 +23,8 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.rashidyusubov.musicapp.presentation.components.TrackItem
+
 @Composable
 fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
 
@@ -199,21 +201,17 @@ fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
 
             items(state.tracks) { track ->
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            viewModel.saveTrackToHistory(track)
-                            searchFocused = false
-                            keyboardController?.hide()
-                        }
-                        .padding(16.dp)
-                ) {
+                TrackItem(
+                    track = track,
+                    onClick = {
 
-                    Text(
-                        text = track.title
-                    )
-                }
+                        viewModel.saveTrackToHistory(track)
+
+                        searchFocused = false
+
+                        keyboardController?.hide()
+                    }
+                )
             }
         }
     }
