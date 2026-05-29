@@ -103,6 +103,9 @@ fun HomeScreen(
                 album = album,
                 onClick = {
 
+                    navController.navigate(
+                        "album/${album.id}"
+                    )
                 }
             )
         }

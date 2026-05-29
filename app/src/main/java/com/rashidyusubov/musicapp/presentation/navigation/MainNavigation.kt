@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.rashidyusubov.musicapp.presentation.album.details.AlbumDetailsScreen
 import com.rashidyusubov.musicapp.presentation.artist.details.ArtistDetailsScreen
 import com.rashidyusubov.musicapp.presentation.auth.login.LoginScreen
 import com.rashidyusubov.musicapp.presentation.auth.register.RegisterScreen
@@ -152,6 +153,66 @@ fun MainNavigation() {
                 ArtistDetailsScreen(
 
                     artistId = artistId,
+
+                    onTrackClick = { trackId ->
+
+                        navController.navigate(
+                            "track/$trackId"
+                        )
+                    }
+                )
+            }
+            composable(
+                route = "track/{trackId}"
+            ) {
+
+                val trackId =
+                    it.arguments
+                        ?.getString("trackId")
+                        ?.toIntOrNull()
+                        ?: 0
+
+                TrackDetailsScreen(
+                    trackId = trackId
+                )
+            }
+
+            composable(
+                route = "artist/{artistId}"
+            ) {
+
+                val artistId =
+                    it.arguments
+                        ?.getString("artistId")
+                        ?.toIntOrNull()
+                        ?: 0
+
+                ArtistDetailsScreen(
+
+                    artistId = artistId,
+
+                    onTrackClick = { trackId ->
+
+                        navController.navigate(
+                            "track/$trackId"
+                        )
+                    }
+                )
+            }
+
+            composable(
+                route = "album/{albumId}"
+            ) {
+
+                val albumId =
+                    it.arguments
+                        ?.getString("albumId")
+                        ?.toIntOrNull()
+                        ?: 0
+
+                AlbumDetailsScreen(
+
+                    albumId = albumId,
 
                     onTrackClick = { trackId ->
 
