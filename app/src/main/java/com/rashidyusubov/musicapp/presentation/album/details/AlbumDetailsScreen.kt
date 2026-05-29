@@ -1,5 +1,6 @@
 package com.rashidyusubov.musicapp.presentation.album.details
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,6 +19,7 @@ import com.rashidyusubov.musicapp.presentation.components.TrackItem
 fun AlbumDetailsScreen(
     albumId: Int,
     onTrackClick: (Int) -> Unit,
+    onArtistClick: (Int) -> Unit,
     viewModel: AlbumDetailsViewModel = hiltViewModel()
 ) {
 
@@ -72,6 +74,28 @@ fun AlbumDetailsScreen(
                 modifier =
                     Modifier.padding(16.dp)
             )
+
+            state.artist?.let { artist ->
+
+                Text(
+                    text = artist.name,
+
+                    style =
+                        MaterialTheme
+                            .typography
+                            .titleMedium,
+
+                    modifier =
+                        Modifier
+                            .padding(horizontal = 16.dp)
+                            .clickable {
+
+                                onArtistClick(
+                                    artist.id
+                                )
+                            }
+                )
+            }
 
             Text(
                 text = album.releaseYear.toString(),

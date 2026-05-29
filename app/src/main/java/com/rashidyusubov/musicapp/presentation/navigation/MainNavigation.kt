@@ -214,6 +214,13 @@ fun MainNavigation() {
 
                     albumId = albumId,
 
+                    onArtistClick = { artistId ->
+
+                        navController.navigate(
+                            "artist/$artistId"
+                        )
+                    },
+
                     onTrackClick = { trackId ->
 
                         navController.navigate(
