@@ -3,6 +3,7 @@ package com.rashidyusubov.musicapp.presentation.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rashidyusubov.musicapp.domain.usecase.GetAllTracksUseCase
+import com.rashidyusubov.musicapp.domain.usecase.GetArtistsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,6 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val getArtistsUseCase: GetArtistsUseCase,
     private val getAllTracksUseCase: GetAllTracksUseCase
 ) : ViewModel() {
 
@@ -24,10 +26,10 @@ class HomeViewModel @Inject constructor(
 
     init {
 
-        loadTracks()
+        loadContent()
     }
 
-    private fun loadTracks() {
+    private fun loadContent() {
 
         viewModelScope.launch {
 
@@ -41,9 +43,13 @@ class HomeViewModel @Inject constructor(
                 val tracks =
                     getAllTracksUseCase()
 
+                val artists =
+                    getArtistsUseCase()
+
                 _state.value =
                     _state.value.copy(
                         tracks = tracks,
+                        artists = artists,
                         isLoading = false
                     )
 
