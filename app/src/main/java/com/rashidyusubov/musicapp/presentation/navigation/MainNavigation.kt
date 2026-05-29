@@ -15,6 +15,7 @@ import com.rashidyusubov.musicapp.presentation.home.HomeScreen
 import com.rashidyusubov.musicapp.presentation.library.LibraryScreen
 import com.rashidyusubov.musicapp.presentation.profile.ProfileScreen
 import com.rashidyusubov.musicapp.presentation.search.SearchScreen
+import com.rashidyusubov.musicapp.presentation.track.TrackDetailsScreen
 
 @Composable
 fun MainNavigation() {
@@ -103,8 +104,9 @@ fun MainNavigation() {
                 )
             }
 
-            composable(BottomNavItem.Home.route) {
-                HomeScreen()
+            composable(BottomNavItem.Home.route) { HomeScreen(
+                    navController = navController
+                )
             }
 
             composable(BottomNavItem.Library.route) {
@@ -117,6 +119,16 @@ fun MainNavigation() {
 
             composable(BottomNavItem.Profile.route) {
                 ProfileScreen()
+            }
+
+            composable(route = "track/{trackId}") {
+
+                val trackId =
+                    it.arguments
+                        ?.getString("trackId")
+                        ?.toIntOrNull() ?: 0
+
+                TrackDetailsScreen(trackId = trackId)
             }
         }
     }
