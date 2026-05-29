@@ -3,6 +3,7 @@ package com.rashidyusubov.musicapp.presentation.library
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -20,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun LibraryScreen(
+    onTrackClick: (Int) -> Unit,
     viewModel: LibraryViewModel = hiltViewModel()
 ) {
 
@@ -64,20 +67,44 @@ fun LibraryScreen(
 
         items(state.tracks) { track ->
 
-            Column(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-                    .clickable { }
+                    .padding(16.dp),
+
+                horizontalArrangement =
+                    Arrangement.SpaceBetween
             ) {
 
-                Text(
-                    text = track.title
-                )
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable {
 
-                Text(
-                    text = track.genre
-                )
+                            onTrackClick(track.id)
+                        }
+                ) {
+
+                    Text(
+                        text = track.title
+                    )
+
+                    Text(
+                        text = track.genre
+                    )
+                }
+
+                TextButton(
+                    onClick = {
+
+                        viewModel.removeFromFavorites(
+                            track.id
+                        )
+                    }
+                ) {
+
+                    Text("💔")
+                }
             }
         }
     }

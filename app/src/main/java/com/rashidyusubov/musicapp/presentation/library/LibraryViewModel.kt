@@ -3,6 +3,7 @@ package com.rashidyusubov.musicapp.presentation.library
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rashidyusubov.musicapp.domain.usecase.GetFavoritesUseCase
+import com.rashidyusubov.musicapp.domain.usecase.RemoveFromFavoritesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,7 +12,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LibraryViewModel @Inject constructor(
-    private val getFavoritesUseCase: GetFavoritesUseCase
+    private val getFavoritesUseCase: GetFavoritesUseCase,
+    private val removeFromFavoritesUseCase: RemoveFromFavoritesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LibraryUiState())
@@ -45,6 +47,25 @@ class LibraryViewModel @Inject constructor(
                         isLoading = false,
                         error = e.message
                     )
+            }
+        }
+    }
+
+    fun removeFromFavorites(
+        trackId: Int
+    ) {
+
+        viewModelScope.launch {
+
+            try {
+
+                removeFromFavoritesUseCase(trackId)
+
+                loadFavorites()
+
+            } catch (e: Exception) {
+
+                e.printStackTrace()
             }
         }
     }

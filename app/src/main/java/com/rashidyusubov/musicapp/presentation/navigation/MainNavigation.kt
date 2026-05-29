@@ -110,7 +110,14 @@ fun MainNavigation() {
             }
 
             composable(BottomNavItem.Library.route) {
-                LibraryScreen()
+
+                LibraryScreen(
+
+                    onTrackClick = { trackId ->
+
+                        navController.navigate("track/$trackId")
+                    }
+                )
             }
 
             composable(BottomNavItem.Search.route) {

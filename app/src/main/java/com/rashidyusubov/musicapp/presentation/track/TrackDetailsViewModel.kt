@@ -6,6 +6,7 @@ import com.rashidyusubov.musicapp.domain.model.Track
 import com.rashidyusubov.musicapp.domain.repository.SearchHistoryRepository
 import com.rashidyusubov.musicapp.domain.usecase.AddToFavoritesUseCase
 import com.rashidyusubov.musicapp.domain.usecase.GetTrackByIdUseCase
+import com.rashidyusubov.musicapp.domain.usecase.RemoveFromFavoritesUseCase
 import com.rashidyusubov.musicapp.domain.usecase.SearchTracksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,9 +16,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TrackDetailsViewModel @Inject constructor(
-
     private val getTrackByIdUseCase: GetTrackByIdUseCase,
-    private val addToFavoritesUseCase: AddToFavoritesUseCase
+    private val addToFavoritesUseCase: AddToFavoritesUseCase,
+    private val removeFromFavoritesUseCase: RemoveFromFavoritesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TrackDetailsUiState())
@@ -58,6 +59,25 @@ class TrackDetailsViewModel @Inject constructor(
                 addToFavoritesUseCase(trackId)
 
                 println("FAVORITE ADDED")
+
+            } catch (e: Exception) {
+
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun removeFromFavorites() {
+
+        val trackId =
+            _state.value.track?.id
+                ?: return
+
+        viewModelScope.launch {
+
+            try {
+
+                removeFromFavoritesUseCase(trackId)
 
             } catch (e: Exception) {
 
