@@ -20,6 +20,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.rashidyusubov.musicapp.presentation.components.EmptyContent
+import com.rashidyusubov.musicapp.presentation.components.ErrorContent
+import com.rashidyusubov.musicapp.presentation.components.LoadingContent
 import com.rashidyusubov.musicapp.presentation.components.TrackItem
 
 @Composable
@@ -37,15 +40,20 @@ fun LibraryScreen(
 
     if (state.isLoading) {
 
-        CircularProgressIndicator()
+        LoadingContent()
 
         return
     }
 
     state.error?.let {
 
-        Text(
-            text = "Ошибка загрузки избранного"
+        ErrorContent(
+            message = "Ошибка загрузки избранного",
+
+            onRetry = {
+
+                viewModel.loadFavorites()
+            }
         )
 
         return
@@ -53,8 +61,8 @@ fun LibraryScreen(
 
     if (state.tracks.isEmpty()) {
 
-        Text(
-            text = "Избранных треков пока нет"
+        EmptyContent(
+            message = "Избранных треков пока нет"
         )
 
         return

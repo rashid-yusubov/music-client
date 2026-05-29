@@ -23,6 +23,9 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.rashidyusubov.musicapp.presentation.components.EmptyContent
+import com.rashidyusubov.musicapp.presentation.components.ErrorContent
+import com.rashidyusubov.musicapp.presentation.components.LoadingContent
 import com.rashidyusubov.musicapp.presentation.components.TrackItem
 
 @Composable
@@ -100,55 +103,35 @@ fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
 
         if (state.isLoading) {
 
-            CircularProgressIndicator()
+            LoadingContent()
+
+            return@Column
         }
 
         state.error?.let {
 
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            ErrorContent(
+                message = "Не удалось получить данные с сервера",
 
-                Text(
-                    text = "Ошибка подключения"
-                )
+                onRetry = {
 
-                Text(
-                    text = "Не удалось получить данные с сервера"
-                )
-
-                Button(
-                    onClick = {
-                        viewModel.retry()
-                    }
-                ) {
-
-                    Text(
-                        text = "Обновить"
-                    )
+                    viewModel.retry()
                 }
-            }
+            )
+
+            return@Column
         }
 
         if (
             state.hasSearched &&
-            state.tracks.isEmpty() &&
-            !state.isLoading &&
-            state.error == null
+            state.tracks.isEmpty()
         ) {
 
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            EmptyContent(
+                message = "Ничего не найдено"
+            )
 
-                Text(
-                    text = "Ничего не найдено"
-                )
-
-                Text(
-                    text = "Попробуйте изменить поисковый запрос"
-                )
-            }
+            return@Column
         }
 
         if (
