@@ -16,4 +16,9 @@ class TracksRepositoryImpl @Inject constructor(private val api: TracksApi) : Tra
     override suspend fun getAllTracks(): List<Track> {
         return api.getAllTracks().map { it.toDomain() }
     }
+
+    override suspend fun getTrackById(id: Int): Track {
+
+        return api.getTrackById(id).toDomain()
+    }
 }

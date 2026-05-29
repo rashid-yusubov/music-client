@@ -19,4 +19,9 @@ class TracksApiImpl @Inject constructor(private val client: HttpClient) : Tracks
 
         return client.get("$BASE_URL/tracks").body()
     }
+
+    override suspend fun getTrackById(id: Int): TrackDto {
+
+        return client.get("$BASE_URL/tracks/$id").body()
+    }
 }
