@@ -1,39 +1,38 @@
 package com.rashidyusubov.musicapp.presentation.track
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.PlaylistAdd
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import com.rashidyusubov.musicapp.presentation.player.AudioPlayerManager
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.rashidyusubov.musicapp.core.network.BASE_URL
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import com.rashidyusubov.musicapp.presentation.player.AudioPlayerManager
 import com.rashidyusubov.musicapp.presentation.playlist.PlaylistsViewModel
 import kotlinx.coroutines.delay
 
 @Composable
 fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltViewModel()) {
-
     val state by viewModel.state.collectAsState()
-
     val playlistsViewModel: PlaylistsViewModel = hiltViewModel()
     val playlistsState by playlistsViewModel.state.collectAsState()
     var showPlaylistDialog by remember { mutableStateOf(false) }
@@ -67,214 +66,150 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
     }
 
     LaunchedEffect(trackId) {
-
         viewModel.loadTrack(trackId)
     }
 
     if (state.isLoading) {
-
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-
-            CircularProgressIndicator()
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
-
-        return
-    }
-
-    state.error?.let {
-
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-
-            Text(
-                text = "Ошибка загрузки трека"
-            )
-        }
-
         return
     }
 
     val track = state.track ?: return
-
     val context = LocalContext.current
-
-    val player = remember {
-
-        AudioPlayerManager(context)
-    }
-
-    var isPlaying by remember {
-        mutableStateOf(false)
-    }
-
-    var currentPosition by remember {
-        mutableStateOf(0L)
-    }
+    val player = remember { AudioPlayerManager(context) }
+    var isPlaying by remember { mutableStateOf(false) }
+    var currentPosition by remember { mutableStateOf(0L) }
 
     DisposableEffect(Unit) {
-
-        onDispose {
-
-            player.release()
-        }
+        onDispose { player.release() }
     }
 
     LaunchedEffect(isPlaying) {
-
         while (isPlaying) {
-
-            currentPosition =
-                player.currentPosition()
-
+            currentPosition = player.currentPosition()
             delay(500)
         }
     }
 
     val minutes = track.duration / 60
     val seconds = track.duration % 60
-
-    val progress = if (player.duration() > 0) currentPosition.toFloat() / player.duration().toFloat()
-
-        else 0f
+    val progress = if (player.duration() > 0) currentPosition.toFloat() / player.duration().toFloat() else 0f
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp),
-
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
+        // Track Cover
         AsyncImage(
             model = track.coverUrl,
             contentDescription = track.title,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(320.dp)
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(24.dp)),
+            contentScale = ContentScale.Crop
         )
 
-        Spacer(
-            modifier = Modifier.height(24.dp)
-        )
+        Spacer(modifier = Modifier.height(32.dp))
 
-        Text(
-            text = track.title,
-            style = MaterialTheme.typography.headlineSmall
-        )
+        // Title and Genre
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = track.title,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = track.genre,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+            )
+        }
 
-        Spacer(
-            modifier = Modifier.height(8.dp)
-        )
+        Spacer(modifier = Modifier.weight(1f))
 
-        Text(
-            text = track.genre,
-            style = MaterialTheme.typography.bodyLarge
-        )
-
-        Spacer(
-            modifier = Modifier.height(24.dp)
-        )
-
-        LinearProgressIndicator(
-            progress = { progress },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(
-            modifier = Modifier.height(8.dp)
+        // Progress Bar
+        Slider(
+            value = progress,
+            onValueChange = {}, // Needs seek implementation
+            colors = SliderDefaults.colors(
+                thumbColor = MaterialTheme.colorScheme.primary,
+                activeTrackColor = MaterialTheme.colorScheme.primary,
+                inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f)
+            )
         )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-
-            horizontalArrangement =
-                Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-
             Text(
-                "%d:%02d".format(
-                    currentPosition / 60000,
-                    (currentPosition / 1000) % 60
+                text = "%d:%02d".format(currentPosition / 60000, (currentPosition / 1000) % 60),
+                style = MaterialTheme.typography.labelMedium
+            )
+            Text(
+                text = "%d:%02d".format(minutes, seconds),
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Controls
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { showPlaylistDialog = true }) {
+                Icon(
+                    imageVector = Icons.Default.PlaylistAdd,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
-            )
+            }
 
-            Text(
-                "%d:%02d".format(
-                    minutes,
-                    seconds
+            // Play/Pause Button
+            FilledIconButton(
+                onClick = {
+                    if (isPlaying) {
+                        player.pause()
+                        isPlaying = false
+                    } else {
+                        player.play(BASE_URL + track.audioUrl.removePrefix("/"))
+                        isPlaying = true
+                    }
+                },
+                modifier = Modifier.size(72.dp),
+                shape = CircleShape,
+                colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Icon(
+                    imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp),
+                    tint = Color.White
                 )
-            )
-        }
-
-        Spacer(
-            modifier = Modifier.height(32.dp)
-        )
-
-        Button(
-            onClick = {
-
-                if (isPlaying) {
-
-                    player.pause()
-
-                    isPlaying = false
-
-                } else {
-
-                    player.play(
-                        BASE_URL +
-                                track.audioUrl.removePrefix("/")
-                    )
-
-                    isPlaying = true
-                }
             }
-        ) {
 
-            Text(
-                text =
-                    if (isPlaying)
-                        "⏸ Пауза"
-                    else
-                        "▶ Воспроизвести"
-            )
-        }
-
-        Spacer(
-            modifier = Modifier.height(16.dp)
-        )
-
-        Button(
-            onClick = {
-
-                viewModel.addToFavorites()
+            IconButton(onClick = { viewModel.addToFavorites() }) {
+                Icon(
+                    imageVector = Icons.Default.FavoriteBorder,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
             }
-        ) {
-
-            Text(
-                text = "❤️ В избранное"
-            )
         }
-
-        Spacer(
-            modifier = Modifier.height(16.dp)
-        )
-
-        Button(
-            onClick = {
-
-                showPlaylistDialog = true
-            }
-        ) {
-
-            Text(
-                text = "➕ В плейлист"
-            )
-        }
+        
+        Spacer(modifier = Modifier.height(48.dp))
     }
 }

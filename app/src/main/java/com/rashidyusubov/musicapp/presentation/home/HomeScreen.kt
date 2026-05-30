@@ -1,14 +1,17 @@
 package com.rashidyusubov.musicapp.presentation.home
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -21,92 +24,64 @@ fun HomeScreen(
     navController: NavHostController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-
     val state by viewModel.state.collectAsState()
 
-    LazyColumn {
-
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 80.dp) // Space for player bar
+    ) {
         item {
-
-            Text(
-                text = "Треки",
-
-                style =
-                    MaterialTheme
-                        .typography
-                        .headlineSmall,
-
-                modifier = Modifier
-                    .padding(16.dp)
-            )
+            SectionHeader(title = "Треки", onSeeAllClick = {})
         }
-
         items(state.tracks) { track ->
-
             TrackItem(
                 track = track,
-                onClick = {
-
-                    navController.navigate(
-                        "track/${track.id}"
-                    )
-                }
+                onClick = { navController.navigate("track/${track.id}") }
             )
         }
 
         item {
-
-            Text(
-                text = "Артисты",
-
-                style =
-                    MaterialTheme
-                        .typography
-                        .headlineSmall,
-
-                modifier = Modifier
-                    .padding(16.dp)
-            )
+            SectionHeader(title = "Артисты", onSeeAllClick = {})
         }
-
         items(state.artists) { artist ->
-
             ArtistItem(
                 artist = artist,
-                onClick = {
-
-                    navController.navigate(
-                        "artist/${artist.id}"
-                    )
-                }
+                onClick = { navController.navigate("artist/${artist.id}") }
             )
         }
 
         item {
-
-            Text(
-                text = "Альбомы",
-
-                style =
-                    MaterialTheme
-                        .typography
-                        .headlineSmall,
-
-                modifier = Modifier
-                    .padding(16.dp)
-            )
+            SectionHeader(title = "Альбомы", onSeeAllClick = {})
         }
-
         items(state.albums) { album ->
-
             AlbumItem(
                 album = album,
-                onClick = {
+                onClick = { navController.navigate("album/${album.id}") }
+            )
+        }
+    }
+}
 
-                    navController.navigate(
-                        "album/${album.id}"
-                    )
-                }
+@Composable
+fun SectionHeader(title: String, onSeeAllClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
+        TextButton(onClick = onSeeAllClick) {
+            Text(
+                text = "BCE",
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
             )
         }
     }
