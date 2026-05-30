@@ -2,9 +2,11 @@ package com.rashidyusubov.musicapp.presentation.playlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rashidyusubov.musicapp.domain.usecase.AddTrackToPlaylistUseCase
 import com.rashidyusubov.musicapp.domain.usecase.CreatePlaylistUseCase
 import com.rashidyusubov.musicapp.domain.usecase.DeletePlaylistUseCase
 import com.rashidyusubov.musicapp.domain.usecase.GetPlaylistsUseCase
+import com.rashidyusubov.musicapp.domain.usecase.RemoveTrackFromPlaylistUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +17,9 @@ import javax.inject.Inject
 class PlaylistsViewModel @Inject constructor(
     private val getPlaylistsUseCase: GetPlaylistsUseCase,
     private val createPlaylistUseCase: CreatePlaylistUseCase,
-    private val deletePlaylistUseCase: DeletePlaylistUseCase
+    private val deletePlaylistUseCase: DeletePlaylistUseCase,
+    private val addTrackToPlaylistUseCase: AddTrackToPlaylistUseCase,
+    private val removeTrackFromPlaylistUseCase: RemoveTrackFromPlaylistUseCase
 ) : ViewModel() {
 
     private val _state =
@@ -63,31 +67,96 @@ class PlaylistsViewModel @Inject constructor(
     }
 
     fun createPlaylist(
-        title: String
+        title: String,
+        description: String? = null
     ) {
-
         viewModelScope.launch {
 
-            createPlaylistUseCase(
-                title = title,
-                description = null
-            )
+            try {
 
-            loadPlaylists()
+                createPlaylistUseCase(
+                    title = title,
+                    description = description
+                )
+
+                loadPlaylists()
+
+            } catch (e: Exception) {
+
+                _state.value =
+                    _state.value.copy(
+                        error = e.message
+                    )
+            }
         }
     }
 
     fun deletePlaylist(
         playlistId: Int
     ) {
-
         viewModelScope.launch {
 
-            deletePlaylistUseCase(
-                playlistId
-            )
+            try {
 
-            loadPlaylists()
+                deletePlaylistUseCase(
+                    playlistId
+                )
+
+                loadPlaylists()
+
+            } catch (e: Exception) {
+
+                _state.value =
+                    _state.value.copy(
+                        error = e.message
+                    )
+            }
+        }
+    }
+
+    fun addTrackToPlaylist(
+        playlistId: Int,
+        trackId: Int
+    ) {
+        viewModelScope.launch {
+
+            try {
+
+                addTrackToPlaylistUseCase(
+                    playlistId = playlistId,
+                    trackId = trackId
+                )
+
+            } catch (e: Exception) {
+
+                _state.value =
+                    _state.value.copy(
+                        error = e.message
+                    )
+            }
+        }
+    }
+
+    fun removeTrackFromPlaylist(
+        playlistId: Int,
+        trackId: Int
+    ) {
+        viewModelScope.launch {
+
+            try {
+
+                removeTrackFromPlaylistUseCase(
+                    playlistId = playlistId,
+                    trackId = trackId
+                )
+
+            } catch (e: Exception) {
+
+                _state.value =
+                    _state.value.copy(
+                        error = e.message
+                    )
+            }
         }
     }
 }

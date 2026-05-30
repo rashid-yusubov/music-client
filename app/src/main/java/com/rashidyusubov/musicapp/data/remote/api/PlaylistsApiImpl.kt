@@ -10,7 +10,9 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.contentType
 import javax.inject.Inject
 
 class PlaylistsApiImpl @Inject constructor(
@@ -29,6 +31,7 @@ class PlaylistsApiImpl @Inject constructor(
         client.post("${BASE_URL}playlists") {
 
             header(HttpHeaders.Authorization, "Bearer $token")
+            contentType(ContentType.Application.Json)
 
             setBody(
                 CreatePlaylistRequest(

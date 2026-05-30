@@ -1,9 +1,13 @@
 package com.rashidyusubov.musicapp.presentation.track
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -22,12 +26,45 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.rashidyusubov.musicapp.presentation.playlist.PlaylistsViewModel
 import kotlinx.coroutines.delay
 
 @Composable
 fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltViewModel()) {
 
     val state by viewModel.state.collectAsState()
+
+    val playlistsViewModel: PlaylistsViewModel = hiltViewModel()
+    val playlistsState by playlistsViewModel.state.collectAsState()
+    var showPlaylistDialog by remember { mutableStateOf(false) }
+
+    if (showPlaylistDialog) {
+        AlertDialog(
+            onDismissRequest = { showPlaylistDialog = false },
+            title = { Text("Добавить в плейлист") },
+            text = {
+                LazyColumn {
+                    items(playlistsState.playlists) { playlist ->
+                        TextButton(
+                            onClick = {
+                                playlistsViewModel.addTrackToPlaylist(playlist.id, trackId)
+                                showPlaylistDialog = false
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(playlist.title)
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { showPlaylistDialog = false }) {
+                    Text("Отмена")
+                }
+            }
+        )
+    }
 
     LaunchedEffect(trackId) {
 
@@ -221,6 +258,22 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
 
             Text(
                 text = "❤️ В избранное"
+            )
+        }
+
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
+
+        Button(
+            onClick = {
+
+                showPlaylistDialog = true
+            }
+        ) {
+
+            Text(
+                text = "➕ В плейлист"
             )
         }
     }
