@@ -3,6 +3,7 @@ package com.rashidyusubov.musicapp.data.remote.api
 import com.rashidyusubov.musicapp.core.network.BASE_URL
 import com.rashidyusubov.musicapp.data.remote.dto.CreatePlaylistRequest
 import com.rashidyusubov.musicapp.data.remote.dto.PlaylistDto
+import com.rashidyusubov.musicapp.data.remote.dto.TrackDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
@@ -24,6 +25,12 @@ class PlaylistsApiImpl @Inject constructor(
         return client.get("${BASE_URL}playlists") {
 
             header(HttpHeaders.Authorization, "Bearer $token") }.body()
+    }
+
+    override suspend fun getPlaylistTracks(playlistId: Int, token: String): List<TrackDto> {
+        return client.get("${BASE_URL}playlists/$playlistId/tracks") {
+            header(HttpHeaders.Authorization, "Bearer $token")
+        }.body()
     }
 
     override suspend fun createPlaylist(token: String, title: String, description: String?) {

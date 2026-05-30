@@ -1,10 +1,13 @@
 package com.rashidyusubov.musicapp.domain.repository
 
 import com.rashidyusubov.musicapp.domain.model.Playlist
+import com.rashidyusubov.musicapp.domain.model.Track
 
 interface PlaylistsRepository {
 
     suspend fun getPlaylists(): List<Playlist>
+
+    suspend fun getPlaylistTracks(playlistId: Int): List<Track>
 
     suspend fun createPlaylist(title: String, description: String?)
 

@@ -4,6 +4,7 @@ import com.rashidyusubov.musicapp.data.mapper.toDomain
 import com.rashidyusubov.musicapp.data.remote.api.PlaylistsApi
 import com.rashidyusubov.musicapp.data.remote.auth.FirebaseTokenProvider
 import com.rashidyusubov.musicapp.domain.model.Playlist
+import com.rashidyusubov.musicapp.domain.model.Track
 import com.rashidyusubov.musicapp.domain.repository.PlaylistsRepository
 import javax.inject.Inject
 
@@ -17,6 +18,11 @@ class PlaylistsRepositoryImpl @Inject constructor(
         val token = tokenProvider.getToken() ?: return emptyList()
 
         return api.getPlaylists(token).map { it.toDomain() }
+    }
+
+    override suspend fun getPlaylistTracks(playlistId: Int): List<Track> {
+        val token = tokenProvider.getToken() ?: return emptyList()
+        return api.getPlaylistTracks(playlistId, token).map { it.toDomain() }
     }
 
     override suspend fun createPlaylist(title: String, description: String?) {

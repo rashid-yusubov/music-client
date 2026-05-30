@@ -15,6 +15,11 @@ import com.rashidyusubov.musicapp.presentation.auth.login.LoginScreen
 import com.rashidyusubov.musicapp.presentation.auth.register.RegisterScreen
 import com.rashidyusubov.musicapp.presentation.home.HomeScreen
 import com.rashidyusubov.musicapp.presentation.library.LibraryScreen
+import com.rashidyusubov.musicapp.presentation.list.AlbumsListScreen
+import com.rashidyusubov.musicapp.presentation.list.ArtistsListScreen
+import com.rashidyusubov.musicapp.presentation.list.PlaylistsListScreen
+import com.rashidyusubov.musicapp.presentation.list.TracksListScreen
+import com.rashidyusubov.musicapp.presentation.playlist.details.PlaylistDetailsScreen
 import com.rashidyusubov.musicapp.presentation.profile.ProfileScreen
 import com.rashidyusubov.musicapp.presentation.search.SearchScreen
 import com.rashidyusubov.musicapp.presentation.track.TrackDetailsScreen
@@ -118,7 +123,52 @@ fun MainNavigation() {
                     onTrackClick = { trackId ->
 
                         navController.navigate("track/$trackId")
+                    },
+                    onPlaylistsClick = {
+                        navController.navigate("playlists")
                     }
+                )
+            }
+
+            composable("all_tracks") {
+                TracksListScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onTrackClick = { trackId -> navController.navigate("track/$trackId") }
+                )
+            }
+
+            composable("all_artists") {
+                ArtistsListScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onArtistClick = { artistId -> navController.navigate("artist/$artistId") }
+                )
+            }
+
+            composable("all_albums") {
+                AlbumsListScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onAlbumClick = { albumId -> navController.navigate("album/$albumId") }
+                )
+            }
+
+            composable("playlists") {
+                PlaylistsListScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onPlaylistClick = { playlistId ->
+                        // We need the title too, or load it in details
+                        navController.navigate("playlist/$playlistId/Плейлист")
+                    }
+                )
+            }
+
+            composable("playlist/{playlistId}/{playlistTitle}") { backStackEntry ->
+                val playlistId = backStackEntry.arguments?.getString("playlistId")?.toIntOrNull() ?: 0
+                val playlistTitle = backStackEntry.arguments?.getString("playlistTitle") ?: "Плейлист"
+                PlaylistDetailsScreen(
+                    playlistId = playlistId,
+                    playlistTitle = playlistTitle,
+                    onBackClick = { navController.popBackStack() },
+                    onTrackClick = { trackId -> navController.navigate("track/$trackId") }
                 )
             }
 
@@ -138,32 +188,6 @@ fun MainNavigation() {
                         ?.toIntOrNull() ?: 0
 
                 TrackDetailsScreen(trackId = trackId)
-            }
-
-            composable(
-                route = "artist/{artistId}"
-            ) {
-
-                val artistId =
-                    it.arguments
-                        ?.getString("artistId")
-                        ?.toIntOrNull()
-                        ?: 0
-            }
-            
-            composable(
-                route = "track/{trackId}"
-            ) {
-
-                val trackId =
-                    it.arguments
-                        ?.getString("trackId")
-                        ?.toIntOrNull()
-                        ?: 0
-
-                TrackDetailsScreen(
-                    trackId = trackId
-                )
             }
 
             composable(

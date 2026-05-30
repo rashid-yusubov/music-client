@@ -3,11 +3,13 @@ package com.rashidyusubov.musicapp.presentation.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.userProfileChangeRequest
 import com.rashidyusubov.musicapp.core.network.BASE_URL
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.parameter
 import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -67,7 +69,8 @@ class AuthViewModel @Inject constructor(private val client: HttpClient) : ViewMo
 
     fun register(
         email: String,
-        password: String
+        password: String,
+        username: String
     ) {
 
         viewModelScope.launch {
@@ -80,12 +83,19 @@ class AuthViewModel @Inject constructor(private val client: HttpClient) : ViewMo
                         error = null
                     )
 
-                auth.createUserWithEmailAndPassword(
+                val result = auth.createUserWithEmailAndPassword(
                     email,
                     password
                 ).await()
 
-                syncUserWithServer()
+                val user = result.user
+                val profileUpdates = userProfileChangeRequest {
+                    displayName = username
+                }
+                user?.updateProfile(profileUpdates)?.await()
+                user?.reload()?.await()
+
+                syncUserWithServer(username)
 
                 _state.value =
                     _state.value.copy(
@@ -104,17 +114,17 @@ class AuthViewModel @Inject constructor(private val client: HttpClient) : ViewMo
         }
     }
 
-    private suspend fun syncUserWithServer() {
+    private suspend fun syncUserWithServer(username: String? = null) {
 
         val token = auth.currentUser
-            ?.getIdToken(false)
+            ?.getIdToken(true)
             ?.await()
             ?.token
             ?: return
 
         client.get("${BASE_URL}auth/me") {
-
             header(HttpHeaders.Authorization, "Bearer $token")
+            username?.let { parameter("username", it) }
         }
     }
 }

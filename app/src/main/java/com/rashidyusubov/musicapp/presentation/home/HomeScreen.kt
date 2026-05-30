@@ -32,9 +32,12 @@ fun HomeScreen(
             .padding(bottom = 80.dp) // Space for player bar
     ) {
         item {
-            SectionHeader(title = "Треки", onSeeAllClick = {})
+            SectionHeader(
+                title = "Треки",
+                onSeeAllClick = { navController.navigate("all_tracks") }
+            )
         }
-        items(state.tracks) { track ->
+        items(state.tracks.take(5)) { track ->
             TrackItem(
                 track = track,
                 onClick = { navController.navigate("track/${track.id}") }
@@ -42,9 +45,12 @@ fun HomeScreen(
         }
 
         item {
-            SectionHeader(title = "Артисты", onSeeAllClick = {})
+            SectionHeader(
+                title = "Артисты",
+                onSeeAllClick = { navController.navigate("all_artists") }
+            )
         }
-        items(state.artists) { artist ->
+        items(state.artists.take(5)) { artist ->
             ArtistItem(
                 artist = artist,
                 onClick = { navController.navigate("artist/${artist.id}") }
@@ -52,9 +58,12 @@ fun HomeScreen(
         }
 
         item {
-            SectionHeader(title = "Альбомы", onSeeAllClick = {})
+            SectionHeader(
+                title = "Альбомы",
+                onSeeAllClick = { navController.navigate("all_albums") }
+            )
         }
-        items(state.albums) { album ->
+        items(state.albums.take(5)) { album ->
             AlbumItem(
                 album = album,
                 onClick = { navController.navigate("album/${album.id}") }

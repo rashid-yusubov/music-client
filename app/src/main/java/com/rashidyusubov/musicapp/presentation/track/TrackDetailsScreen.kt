@@ -12,6 +12,8 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PlaylistAdd
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -138,7 +140,11 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
         // Progress Bar
         Slider(
             value = progress,
-            onValueChange = {}, // Needs seek implementation
+            onValueChange = {
+                val newPos = (it * player.duration()).toLong()
+                player.seekTo(newPos)
+                currentPosition = newPos
+            },
             colors = SliderDefaults.colors(
                 thumbColor = MaterialTheme.colorScheme.primary,
                 activeTrackColor = MaterialTheme.colorScheme.primary,
@@ -177,6 +183,15 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
                 )
             }
 
+            IconButton(onClick = { player.previous() }) {
+                Icon(
+                    imageVector = Icons.Default.SkipPrevious,
+                    contentDescription = null,
+                    modifier = Modifier.size(36.dp),
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
             // Play/Pause Button
             FilledIconButton(
                 onClick = {
@@ -200,12 +215,21 @@ fun TrackDetailsScreen(trackId: Int, viewModel: TrackDetailsViewModel = hiltView
                 )
             }
 
-            IconButton(onClick = { viewModel.addToFavorites() }) {
+            IconButton(onClick = { player.next() }) {
                 Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
+                    imageVector = Icons.Default.SkipNext,
+                    contentDescription = null,
+                    modifier = Modifier.size(36.dp),
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            IconButton(onClick = { viewModel.toggleFavorite() }) {
+                Icon(
+                    imageVector = if (state.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = null,
                     modifier = Modifier.size(32.dp),
-                    tint = MaterialTheme.colorScheme.onBackground
+                    tint = if (state.isFavorite) Color.Red else MaterialTheme.colorScheme.onBackground
                 )
             }
         }

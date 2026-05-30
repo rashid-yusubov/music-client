@@ -24,6 +24,7 @@ import com.rashidyusubov.musicapp.presentation.playlist.PlaylistsViewModel
 @Composable
 fun LibraryScreen(
     onTrackClick: (Int) -> Unit,
+    onPlaylistsClick: () -> Unit,
     viewModel: LibraryViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -116,7 +117,7 @@ fun LibraryScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { /* Navigate to playlists */ }
+                    .clickable { onPlaylistsClick() }
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {

@@ -1,5 +1,7 @@
 package com.rashidyusubov.musicapp.presentation.profile
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -18,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,6 +36,13 @@ fun ProfileScreen(
     val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
     val viewModel: ProfileViewModel = hiltViewModel()
     val user by viewModel.user.collectAsState()
+    val context = LocalContext.current
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: android.net.Uri? ->
+        uri?.let { viewModel.updateAvatar(it, context) }
+    }
 
     Column(
         modifier = Modifier
@@ -72,7 +82,7 @@ fun ProfileScreen(
             }
             
             FloatingActionButton(
-                onClick = { /* Edit profile */ },
+                onClick = { launcher.launch("image/*") },
                 modifier = Modifier.size(32.dp),
                 shape = CircleShape,
                 containerColor = MaterialTheme.colorScheme.primary,

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.rashidyusubov.musicapp.domain.model.Track
 import com.rashidyusubov.musicapp.domain.repository.SearchHistoryRepository
 import com.rashidyusubov.musicapp.domain.usecase.AddToFavoritesUseCase
+import com.rashidyusubov.musicapp.domain.usecase.GetFavoritesUseCase
 import com.rashidyusubov.musicapp.domain.usecase.GetTrackByIdUseCase
 import com.rashidyusubov.musicapp.domain.usecase.RemoveFromFavoritesUseCase
 import com.rashidyusubov.musicapp.domain.usecase.SearchTracksUseCase
@@ -18,7 +19,8 @@ import javax.inject.Inject
 class TrackDetailsViewModel @Inject constructor(
     private val getTrackByIdUseCase: GetTrackByIdUseCase,
     private val addToFavoritesUseCase: AddToFavoritesUseCase,
-    private val removeFromFavoritesUseCase: RemoveFromFavoritesUseCase
+    private val removeFromFavoritesUseCase: RemoveFromFavoritesUseCase,
+    private val getFavoritesUseCase: GetFavoritesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TrackDetailsUiState())
@@ -34,8 +36,14 @@ class TrackDetailsViewModel @Inject constructor(
                 _state.value = _state.value.copy(isLoading = true)
 
                 val track = getTrackByIdUseCase(trackId)
+                val favorites = getFavoritesUseCase()
+                val isFavorite = favorites.any { it.id == trackId }
 
-                _state.value = _state.value.copy(track = track, isLoading = false)
+                _state.value = _state.value.copy(
+                    track = track,
+                    isFavorite = isFavorite,
+                    isLoading = false
+                )
 
             } catch (e: Exception) {
 
@@ -44,43 +52,19 @@ class TrackDetailsViewModel @Inject constructor(
         }
     }
 
-    fun addToFavorites() {
-
-        val trackId =
-            _state.value.track?.id
-                ?: return
+    fun toggleFavorite() {
+        val trackId = _state.value.track?.id ?: return
+        val isFavorite = _state.value.isFavorite
 
         viewModelScope.launch {
-
             try {
-
-                println("ADD FAVORITE: $trackId")
-
-                addToFavoritesUseCase(trackId)
-
-                println("FAVORITE ADDED")
-
+                if (isFavorite) {
+                    removeFromFavoritesUseCase(trackId)
+                } else {
+                    addToFavoritesUseCase(trackId)
+                }
+                _state.value = _state.value.copy(isFavorite = !isFavorite)
             } catch (e: Exception) {
-
-                e.printStackTrace()
-            }
-        }
-    }
-
-    fun removeFromFavorites() {
-
-        val trackId =
-            _state.value.track?.id
-                ?: return
-
-        viewModelScope.launch {
-
-            try {
-
-                removeFromFavoritesUseCase(trackId)
-
-            } catch (e: Exception) {
-
                 e.printStackTrace()
             }
         }
