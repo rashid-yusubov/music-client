@@ -14,7 +14,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val searchTracksUseCase: SearchTracksUseCase,
-    private val historyRepository: SearchHistoryRepository
+    private val historyRepository: SearchHistoryRepository,
+    private val getArtistsUseCase: com.rashidyusubov.musicapp.domain.usecase.GetArtistsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -68,11 +69,18 @@ class SearchViewModel @Inject constructor(
 
                 val tracks =
                     searchTracksUseCase(query)
+                
+                val artists = getArtistsUseCase()
+                val artistMap = artists.associateBy { it.id }
+                
+                val enrichedTracks = tracks.map { track ->
+                    track.copy(artistName = artistMap[track.artistId]?.name)
+                }
 
                 _state.value =
                     _state.value.copy(
                         isLoading = false,
-                        tracks = tracks
+                        tracks = enrichedTracks
                     )
 
             } catch (e: Exception) {

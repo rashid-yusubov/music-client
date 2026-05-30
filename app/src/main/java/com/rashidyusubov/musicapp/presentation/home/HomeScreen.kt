@@ -18,18 +18,20 @@ import androidx.navigation.NavHostController
 import com.rashidyusubov.musicapp.presentation.components.AlbumItem
 import com.rashidyusubov.musicapp.presentation.components.ArtistItem
 import com.rashidyusubov.musicapp.presentation.components.TrackItem
+import com.rashidyusubov.musicapp.presentation.player.PlayerViewModel
 
 @Composable
 fun HomeScreen(
     navController: NavHostController,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 80.dp) // Space for player bar
+            .padding(bottom = 8.dp) // Space for mini player handled by Scaffold
     ) {
         item {
             SectionHeader(
@@ -40,7 +42,7 @@ fun HomeScreen(
         items(state.tracks.take(5)) { track ->
             TrackItem(
                 track = track,
-                onClick = { navController.navigate("track/${track.id}") }
+                onClick = { playerViewModel.playTracks(state.tracks, state.tracks.indexOf(track)) }
             )
         }
 

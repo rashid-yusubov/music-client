@@ -20,7 +20,8 @@ class TrackDetailsViewModel @Inject constructor(
     private val getTrackByIdUseCase: GetTrackByIdUseCase,
     private val addToFavoritesUseCase: AddToFavoritesUseCase,
     private val removeFromFavoritesUseCase: RemoveFromFavoritesUseCase,
-    private val getFavoritesUseCase: GetFavoritesUseCase
+    private val getFavoritesUseCase: GetFavoritesUseCase,
+    private val getArtistByIdUseCase: com.rashidyusubov.musicapp.domain.usecase.GetArtistByIdUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TrackDetailsUiState())
@@ -38,9 +39,17 @@ class TrackDetailsViewModel @Inject constructor(
                 val track = getTrackByIdUseCase(trackId)
                 val favorites = getFavoritesUseCase()
                 val isFavorite = favorites.any { it.id == trackId }
+                
+                val artist = try {
+                    getArtistByIdUseCase(track.artistId)
+                } catch (e: Exception) {
+                    null
+                }
+                
+                val enrichedTrack = track.copy(artistName = artist?.name ?: track.genre)
 
                 _state.value = _state.value.copy(
-                    track = track,
+                    track = enrichedTrack,
                     isFavorite = isFavorite,
                     isLoading = false
                 )

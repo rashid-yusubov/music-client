@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.ui)
+    implementation(libs.media3.session)
     implementation(libs.material.icons.extended)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
 }

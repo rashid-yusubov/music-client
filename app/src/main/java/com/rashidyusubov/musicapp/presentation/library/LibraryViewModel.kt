@@ -13,7 +13,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LibraryViewModel @Inject constructor(
     private val getFavoritesUseCase: GetFavoritesUseCase,
-    private val removeFromFavoritesUseCase: RemoveFromFavoritesUseCase
+    private val removeFromFavoritesUseCase: RemoveFromFavoritesUseCase,
+    private val getArtistsUseCase: com.rashidyusubov.musicapp.domain.usecase.GetArtistsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LibraryUiState())
@@ -33,11 +34,17 @@ class LibraryViewModel @Inject constructor(
                     )
 
                 val tracks = getFavoritesUseCase()
+                val artists = getArtistsUseCase()
+                val artistMap = artists.associateBy { it.id }
+                
+                val enrichedTracks = tracks.map { track ->
+                    track.copy(artistName = artistMap[track.artistId]?.name)
+                }
 
                 _state.value =
                     _state.value.copy(
                         isLoading = false,
-                        tracks = tracks
+                        tracks = enrichedTracks
                     )
 
             } catch (e: Exception) {

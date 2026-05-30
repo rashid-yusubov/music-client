@@ -4,6 +4,7 @@ data class Track(
     val id: Int,
     val title: String,
     val artistId: Int,
+    val artistName: String? = null,
     val albumId: Int,
     val duration: Int,
     val genre: String,

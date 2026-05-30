@@ -1,9 +1,12 @@
 package com.rashidyusubov.musicapp.presentation.navigation
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -19,15 +22,24 @@ import com.rashidyusubov.musicapp.presentation.list.AlbumsListScreen
 import com.rashidyusubov.musicapp.presentation.list.ArtistsListScreen
 import com.rashidyusubov.musicapp.presentation.list.PlaylistsListScreen
 import com.rashidyusubov.musicapp.presentation.list.TracksListScreen
+import com.rashidyusubov.musicapp.presentation.player.PlayerViewModel
+import com.rashidyusubov.musicapp.presentation.player.components.FullPlayer
+import com.rashidyusubov.musicapp.presentation.player.components.MiniPlayer
 import com.rashidyusubov.musicapp.presentation.playlist.details.PlaylistDetailsScreen
 import com.rashidyusubov.musicapp.presentation.profile.ProfileScreen
 import com.rashidyusubov.musicapp.presentation.search.SearchScreen
 import com.rashidyusubov.musicapp.presentation.track.TrackDetailsScreen
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigation() {
 
     val navController = rememberNavController()
+    val playerViewModel: PlayerViewModel = hiltViewModel()
+    val currentTrack by playerViewModel.currentTrack.collectAsState()
+    
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showFullPlayer by remember { mutableStateOf(false) }
 
     var currentUser by remember {
         mutableStateOf(FirebaseAuth.getInstance().currentUser)
@@ -47,13 +59,36 @@ fun MainNavigation() {
 
     Scaffold(
         bottomBar = {
-
             if (isAuthorized) {
-
-                BottomBar(navController)
+                Column {
+                    if (currentTrack != null) {
+                        MiniPlayer(
+                            track = currentTrack!!,
+                            playerViewModel = playerViewModel,
+                            onClick = { showFullPlayer = true }
+                        )
+                    }
+                    BottomBar(navController)
+                }
             }
         }
     ) { innerPadding ->
+        
+        if (showFullPlayer && currentTrack != null) {
+            ModalBottomSheet(
+                onDismissRequest = { showFullPlayer = false },
+                sheetState = sheetState,
+                dragHandle = null,
+                containerColor = MaterialTheme.colorScheme.background,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                FullPlayer(
+                    track = currentTrack!!,
+                    playerViewModel = playerViewModel,
+                    onMinimize = { showFullPlayer = false }
+                )
+            }
+        }
 
         NavHost(
             navController = navController,
@@ -111,8 +146,10 @@ fun MainNavigation() {
                 )
             }
 
-            composable(BottomNavItem.Home.route) { HomeScreen(
-                    navController = navController
+            composable(BottomNavItem.Home.route) {
+                HomeScreen(
+                    navController = navController,
+                    playerViewModel = playerViewModel
                 )
             }
 
@@ -126,14 +163,16 @@ fun MainNavigation() {
                     },
                     onPlaylistsClick = {
                         navController.navigate("playlists")
-                    }
+                    },
+                    playerViewModel = playerViewModel
                 )
             }
 
             composable("all_tracks") {
                 TracksListScreen(
                     onBackClick = { navController.popBackStack() },
-                    onTrackClick = { trackId -> navController.navigate("track/$trackId") }
+                    onTrackClick = { trackId -> navController.navigate("track/$trackId") },
+                    playerViewModel = playerViewModel
                 )
             }
 
@@ -141,6 +180,7 @@ fun MainNavigation() {
                 ArtistsListScreen(
                     onBackClick = { navController.popBackStack() },
                     onArtistClick = { artistId -> navController.navigate("artist/$artistId") }
+                    // playerViewModel = playerViewModel // If ArtistsListScreen needs it
                 )
             }
 
@@ -148,6 +188,7 @@ fun MainNavigation() {
                 AlbumsListScreen(
                     onBackClick = { navController.popBackStack() },
                     onAlbumClick = { albumId -> navController.navigate("album/$albumId") }
+                    // playerViewModel = playerViewModel // If AlbumsListScreen needs it
                 )
             }
 
@@ -168,7 +209,8 @@ fun MainNavigation() {
                     playlistId = playlistId,
                     playlistTitle = playlistTitle,
                     onBackClick = { navController.popBackStack() },
-                    onTrackClick = { trackId -> navController.navigate("track/$trackId") }
+                    onTrackClick = { trackId -> navController.navigate("track/$trackId") },
+                    playerViewModel = playerViewModel
                 )
             }
 
@@ -187,7 +229,10 @@ fun MainNavigation() {
                         ?.getString("trackId")
                         ?.toIntOrNull() ?: 0
 
-                TrackDetailsScreen(trackId = trackId)
+                TrackDetailsScreen(
+                    trackId = trackId,
+                    playerViewModel = playerViewModel
+                )
             }
 
             composable(
@@ -216,7 +261,8 @@ fun MainNavigation() {
                         navController.navigate(
                             "track/$trackId"
                         )
-                    }
+                    },
+                    playerViewModel = playerViewModel
                 )
             }
 
@@ -246,7 +292,8 @@ fun MainNavigation() {
                         navController.navigate(
                             "track/$trackId"
                         )
-                    }
+                    },
+                    playerViewModel = playerViewModel
                 )
             }
         }

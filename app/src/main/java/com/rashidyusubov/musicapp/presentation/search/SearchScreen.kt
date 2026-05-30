@@ -28,9 +28,12 @@ import com.rashidyusubov.musicapp.presentation.components.EmptyContent
 import com.rashidyusubov.musicapp.presentation.components.ErrorContent
 import com.rashidyusubov.musicapp.presentation.components.LoadingContent
 import com.rashidyusubov.musicapp.presentation.components.TrackItem
+import com.rashidyusubov.musicapp.presentation.player.PlayerViewModel
 
 @Composable
-fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
+fun SearchScreen(
+    viewModel: SearchViewModel = hiltViewModel(),
+) {
     val state by viewModel.state.collectAsState()
     var searchFocused by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -133,7 +136,7 @@ fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
             }
         }
 
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(bottom = 80.dp)) {
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(bottom = 0.dp)) {
             items(state.tracks) { track ->
                 TrackItem(
                     track = track,

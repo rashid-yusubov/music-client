@@ -126,6 +126,10 @@ class PlaylistsViewModel @Inject constructor(
                     playlistId = playlistId,
                     trackId = trackId
                 )
+                _state.value = _state.value.copy(trackAdded = true)
+                // Reset after some time
+                kotlinx.coroutines.delay(2000)
+                _state.value = _state.value.copy(trackAdded = false)
 
             } catch (e: Exception) {
 

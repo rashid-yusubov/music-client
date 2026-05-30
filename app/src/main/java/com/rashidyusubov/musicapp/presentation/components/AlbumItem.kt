@@ -7,13 +7,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.PlayCircleOutline
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -25,59 +24,64 @@ fun AlbumItem(
     album: Album,
     onClick: () -> Unit
 ) {
-    Row(
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .clickable(onClick = onClick),
+        color = Color.Transparent
     ) {
-        Box(
+        Row(
             modifier = Modifier
-                .size(64.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            if (!album.coverUrl.isNullOrBlank()) {
-                AsyncImage(
-                    model = album.coverUrl,
-                    contentDescription = album.title,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                if (!album.coverUrl.isNullOrBlank()) {
+                    AsyncImage(
+                        model = album.coverUrl,
+                        contentDescription = album.title,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Album,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = album.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 1
                 )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Album,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(32.dp)
+                Text(
+                    text = "Альбом",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                 )
             }
-        }
 
-        Spacer(modifier = Modifier.width(16.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = album.title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            // Ideally should have artist name here
-            Text(
-                text = "Studio Session", // Placeholder for subtitle in mockup
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+            Icon(
+                imageVector = Icons.Default.PlayCircleOutline,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+                modifier = Modifier.size(28.dp)
             )
         }
-
-        Icon(
-            imageVector = Icons.Default.PlayCircleOutline,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-            modifier = Modifier.size(28.dp)
-        )
     }
 }

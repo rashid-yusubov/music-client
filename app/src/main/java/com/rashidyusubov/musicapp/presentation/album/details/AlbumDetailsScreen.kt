@@ -14,13 +14,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.rashidyusubov.musicapp.presentation.components.TrackItem
+import com.rashidyusubov.musicapp.presentation.player.PlayerViewModel
 
 @Composable
 fun AlbumDetailsScreen(
     albumId: Int,
     onTrackClick: (Int) -> Unit,
     onArtistClick: (Int) -> Unit,
-    viewModel: AlbumDetailsViewModel = hiltViewModel()
+    viewModel: AlbumDetailsViewModel = hiltViewModel(),
+    playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
 
     val state by viewModel.state.collectAsState()
@@ -129,7 +131,7 @@ fun AlbumDetailsScreen(
                 track = track,
                 onClick = {
 
-                    onTrackClick(track.id)
+                    playerViewModel.playTracks(state.tracks, state.tracks.indexOf(track))
                 }
             )
         }

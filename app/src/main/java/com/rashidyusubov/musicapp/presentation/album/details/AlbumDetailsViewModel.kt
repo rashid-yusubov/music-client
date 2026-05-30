@@ -44,12 +44,16 @@ class AlbumDetailsViewModel @Inject constructor(
                 val artist = getArtistByIdUseCase(album.artistId)
 
                 val tracks = getAlbumTracksUseCase(albumId)
+                
+                val enrichedTracks = tracks.map { track ->
+                    track.copy(artistName = artist.name)
+                }
 
                 _state.value =
                     _state.value.copy(
                         album = album,
                         artist = artist,
-                        tracks = tracks,
+                        tracks = enrichedTracks,
                         isLoading = false
                     )
 

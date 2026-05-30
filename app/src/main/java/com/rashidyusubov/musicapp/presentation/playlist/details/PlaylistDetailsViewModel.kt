@@ -23,7 +23,8 @@ data class PlaylistDetailsUiState(
 class PlaylistDetailsViewModel @Inject constructor(
     private val getPlaylistTracksUseCase: GetPlaylistTracksUseCase,
     private val deletePlaylistUseCase: DeletePlaylistUseCase,
-    private val removeTrackFromPlaylistUseCase: RemoveTrackFromPlaylistUseCase
+    private val removeTrackFromPlaylistUseCase: RemoveTrackFromPlaylistUseCase,
+    private val getArtistsUseCase: com.rashidyusubov.musicapp.domain.usecase.GetArtistsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PlaylistDetailsUiState())
@@ -34,7 +35,14 @@ class PlaylistDetailsViewModel @Inject constructor(
             try {
                 _state.value = _state.value.copy(isLoading = true)
                 val tracks = getPlaylistTracksUseCase(playlistId)
-                _state.value = _state.value.copy(tracks = tracks, isLoading = false)
+                val artists = getArtistsUseCase()
+                val artistMap = artists.associateBy { it.id }
+                
+                val enrichedTracks = tracks.map { track ->
+                    track.copy(artistName = artistMap[track.artistId]?.name)
+                }
+                
+                _state.value = _state.value.copy(tracks = enrichedTracks, isLoading = false)
             } catch (e: Exception) {
                 _state.value = _state.value.copy(error = e.message, isLoading = false)
             }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -32,44 +33,66 @@ fun PlaylistsListScreen(
     if (showCreateDialog) {
         AlertDialog(
             onDismissRequest = { showCreateDialog = false },
-            title = { Text("Создать плейлист") },
-            text = {
-                Column {
-                    TextField(
-                        value = playlistTitle,
-                        onValueChange = { playlistTitle = it },
-                        label = { Text("Название") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextField(
-                        value = playlistDescription,
-                        onValueChange = { playlistDescription = it },
-                        label = { Text("Описание") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        if (playlistTitle.isNotBlank()) {
-                            viewModel.createPlaylist(
-                                title = playlistTitle,
-                                description = playlistDescription.takeIf { it.isNotBlank() }
-                            )
-                            showCreateDialog = false
-                            playlistTitle = ""
-                            playlistDescription = ""
+            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
+            modifier = Modifier.padding(24.dp),
+            content = {
+                Surface(
+                    shape = RoundedCornerShape(28.dp),
+                    tonalElevation = 6.dp,
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Создать плейлист",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        OutlinedTextField(
+                            value = playlistTitle,
+                            onValueChange = { playlistTitle = it },
+                            label = { Text("Название") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedTextField(
+                            value = playlistDescription,
+                            onValueChange = { playlistDescription = it },
+                            label = { Text("Описание") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        Spacer(modifier = Modifier.height(32.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            TextButton(onClick = { showCreateDialog = false }) {
+                                Text("Отмена")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(
+                                onClick = {
+                                    if (playlistTitle.isNotBlank()) {
+                                        viewModel.createPlaylist(
+                                            title = playlistTitle,
+                                            description = playlistDescription.takeIf { it.isNotBlank() }
+                                        )
+                                        showCreateDialog = false
+                                        playlistTitle = ""
+                                        playlistDescription = ""
+                                    }
+                                },
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Text("Создать")
+                            }
                         }
                     }
-                ) {
-                    Text("Создать")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showCreateDialog = false }) {
-                    Text("Отмена")
                 }
             }
         )

@@ -11,7 +11,7 @@ class FirebaseTokenProvider @Inject constructor() {
         return FirebaseAuth
             .getInstance()
             .currentUser
-            ?.getIdToken(false)
+            ?.getIdToken(true)
             ?.await()
             ?.token
     }

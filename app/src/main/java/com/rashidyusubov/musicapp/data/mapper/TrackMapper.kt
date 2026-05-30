@@ -7,6 +7,7 @@ fun TrackDto.toDomain() = Track(
     id = id,
     title = title,
     artistId = artistId,
+    artistName = artistName,
     albumId = albumId,
     duration = duration,
     genre = genre,

@@ -5,10 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.PlaylistPlay
 import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,13 +21,16 @@ import com.rashidyusubov.musicapp.presentation.components.EmptyContent
 import com.rashidyusubov.musicapp.presentation.components.ErrorContent
 import com.rashidyusubov.musicapp.presentation.components.LoadingContent
 import com.rashidyusubov.musicapp.presentation.components.TrackItem
+import com.rashidyusubov.musicapp.presentation.player.PlayerViewModel
 import com.rashidyusubov.musicapp.presentation.playlist.PlaylistsViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryScreen(
     onTrackClick: (Int) -> Unit,
     onPlaylistsClick: () -> Unit,
-    viewModel: LibraryViewModel = hiltViewModel()
+    viewModel: LibraryViewModel = hiltViewModel(),
+    playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val playlistsViewModel: PlaylistsViewModel = hiltViewModel()
@@ -38,44 +43,66 @@ fun LibraryScreen(
     if (showCreateDialog) {
         AlertDialog(
             onDismissRequest = { showCreateDialog = false },
-            title = { Text("Создать плейлист") },
-            text = {
-                Column {
-                    TextField(
-                        value = playlistTitle,
-                        onValueChange = { playlistTitle = it },
-                        label = { Text("Название") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextField(
-                        value = playlistDescription,
-                        onValueChange = { playlistDescription = it },
-                        label = { Text("Описание") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        if (playlistTitle.isNotBlank()) {
-                            playlistsViewModel.createPlaylist(
-                                title = playlistTitle,
-                                description = playlistDescription.takeIf { it.isNotBlank() }
-                            )
-                            showCreateDialog = false
-                            playlistTitle = ""
-                            playlistDescription = ""
+            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
+            modifier = Modifier.padding(24.dp),
+            content = {
+                Surface(
+                    shape = RoundedCornerShape(28.dp),
+                    tonalElevation = 6.dp,
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Новый плейлист",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        OutlinedTextField(
+                            value = playlistTitle,
+                            onValueChange = { playlistTitle = it },
+                            label = { Text("Название") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedTextField(
+                            value = playlistDescription,
+                            onValueChange = { playlistDescription = it },
+                            label = { Text("Описание (необязательно)") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        Spacer(modifier = Modifier.height(32.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            TextButton(onClick = { showCreateDialog = false }) {
+                                Text("Отмена")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(
+                                onClick = {
+                                    if (playlistTitle.isNotBlank()) {
+                                        playlistsViewModel.createPlaylist(
+                                            title = playlistTitle,
+                                            description = playlistDescription.takeIf { it.isNotBlank() }
+                                        )
+                                        showCreateDialog = false
+                                        playlistTitle = ""
+                                        playlistDescription = ""
+                                    }
+                                },
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Text("Создать")
+                            }
                         }
                     }
-                ) {
-                    Text("Создать")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showCreateDialog = false }) {
-                    Text("Отмена")
                 }
             }
         )
@@ -158,7 +185,7 @@ fun LibraryScreen(
             items(state.tracks) { track ->
                 TrackItem(
                     track = track,
-                    onClick = { onTrackClick(track.id) }
+                    onClick = { playerViewModel.playTracks(state.tracks, state.tracks.indexOf(track)) }
                 )
             }
         }

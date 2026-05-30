@@ -51,9 +51,14 @@ class HomeViewModel @Inject constructor(
                 val albums =
                     getAlbumsUseCase()
 
+                val artistMap = artists.associateBy { it.id }
+                val enrichedTracks = tracks.map { track ->
+                    track.copy(artistName = artistMap[track.artistId]?.name)
+                }
+
                 _state.value =
                     _state.value.copy(
-                        tracks = tracks,
+                        tracks = enrichedTracks,
                         artists = artists,
                         albums = albums,
                         isLoading = false

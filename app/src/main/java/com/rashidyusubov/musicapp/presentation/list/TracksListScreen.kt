@@ -15,13 +15,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rashidyusubov.musicapp.presentation.components.TrackItem
 import com.rashidyusubov.musicapp.presentation.home.HomeViewModel
+import com.rashidyusubov.musicapp.presentation.player.PlayerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TracksListScreen(
     onBackClick: () -> Unit,
     onTrackClick: (Int) -> Unit,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -45,7 +47,7 @@ fun TracksListScreen(
             items(state.tracks) { track ->
                 TrackItem(
                     track = track,
-                    onClick = { onTrackClick(track.id) }
+                    onClick = { playerViewModel.playTracks(state.tracks, state.tracks.indexOf(track)) }
                 )
             }
         }
