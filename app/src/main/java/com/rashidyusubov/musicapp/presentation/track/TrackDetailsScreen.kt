@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.rashidyusubov.musicapp.core.network.BASE_URL
+import com.rashidyusubov.musicapp.presentation.components.TrackActionsBottomSheet
 import com.rashidyusubov.musicapp.presentation.player.PlayerViewModel
 import com.rashidyusubov.musicapp.presentation.playlist.PlaylistsViewModel
 
@@ -31,61 +32,32 @@ fun TrackDetailsScreen(
     trackId: Int,
     viewModel: TrackDetailsViewModel = hiltViewModel(),
     playerViewModel: PlayerViewModel = hiltViewModel(),
-    playlistsViewModel: PlaylistsViewModel = hiltViewModel()
+    playlistsViewModel: PlaylistsViewModel = hiltViewModel(),
+    trackActionsViewModel: TrackActionsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    val playlistsState by playlistsViewModel.state.collectAsState()
-    var showPlaylistSheet by remember { mutableStateOf(false) }
+    val playlists by trackActionsViewModel.playlists.collectAsState()
+    var showTrackActions by remember { mutableStateOf(false) }
 
-    if (showPlaylistSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showPlaylistSheet = false },
-            containerColor = MaterialTheme.colorScheme.surface,
-            tonalElevation = 8.dp
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "Добавить в плейлист",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(playlistsState.playlists) { playlist ->
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    playlistsViewModel.addTrackToPlaylist(playlist.id, trackId)
-                                    showPlaylistSheet = false
-                                },
-                            shape = RoundedCornerShape(12.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(Icons.Default.PlaylistPlay, contentDescription = null)
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Text(playlist.title, style = MaterialTheme.typography.bodyLarge)
-                            }
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(24.dp))
+    if (showTrackActions && state.track != null) {
+        TrackActionsBottomSheet(
+            track = state.track!!,
+            playlists = playlists,
+            isFavorite = trackActionsViewModel.isFavorite(state.track!!.id),
+            initialShowPlaylists = true,
+            onDismissRequest = { showTrackActions = false },
+            onFavoriteClick = { 
+                trackActionsViewModel.toggleFavorite(it)
+                viewModel.loadTrack(trackId) // Refresh local state
+            },
+            onAddToPlaylistClick = { track, pid ->
+                trackActionsViewModel.addTrackToPlaylist(track.id, pid)
             }
-        }
+        )
     }
 
     LaunchedEffect(trackId) {
+// ...
         viewModel.loadTrack(trackId)
     }
 
@@ -177,7 +149,7 @@ fun TrackDetailsScreen(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { showPlaylistSheet = true }) {
+            IconButton(onClick = { showTrackActions = true }) {
                 Icon(
                     imageVector = Icons.Default.PlaylistAdd,
                     contentDescription = null,

@@ -17,12 +17,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.rashidyusubov.musicapp.domain.model.Track
 import com.rashidyusubov.musicapp.presentation.components.EmptyContent
 import com.rashidyusubov.musicapp.presentation.components.ErrorContent
 import com.rashidyusubov.musicapp.presentation.components.LoadingContent
+import com.rashidyusubov.musicapp.presentation.components.TrackActionsBottomSheet
 import com.rashidyusubov.musicapp.presentation.components.TrackItem
 import com.rashidyusubov.musicapp.presentation.player.PlayerViewModel
 import com.rashidyusubov.musicapp.presentation.playlist.PlaylistsViewModel
+import com.rashidyusubov.musicapp.presentation.track.TrackActionsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,14 +33,35 @@ fun LibraryScreen(
     onTrackClick: (Int) -> Unit,
     onPlaylistsClick: () -> Unit,
     viewModel: LibraryViewModel = hiltViewModel(),
-    playerViewModel: PlayerViewModel = hiltViewModel()
+    playerViewModel: PlayerViewModel = hiltViewModel(),
+    trackActionsViewModel: TrackActionsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val playlistsViewModel: PlaylistsViewModel = hiltViewModel()
     val playlistsState by playlistsViewModel.state.collectAsState()
+    
+    val playlists by trackActionsViewModel.playlists.collectAsState()
+    var selectedTrackForActions by remember { mutableStateOf<Track?>(null) }
+
+    if (selectedTrackForActions != null) {
+        TrackActionsBottomSheet(
+            track = selectedTrackForActions!!,
+            playlists = playlists,
+            isFavorite = trackActionsViewModel.isFavorite(selectedTrackForActions!!.id),
+            onDismissRequest = { selectedTrackForActions = null },
+            onFavoriteClick = { 
+                trackActionsViewModel.toggleFavorite(it)
+                viewModel.loadFavorites() // Refresh library
+            },
+            onAddToPlaylistClick = { track, pid ->
+                trackActionsViewModel.addTrackToPlaylist(track.id, pid)
+            }
+        )
+    }
 
     var showCreateDialog by remember { mutableStateOf(false) }
-    var playlistTitle by remember { mutableStateOf("") }
+    var
+playlistTitle by remember { mutableStateOf("") }
     var playlistDescription by remember { mutableStateOf("") }
 
     if (showCreateDialog) {
@@ -185,7 +209,8 @@ fun LibraryScreen(
             items(state.tracks) { track ->
                 TrackItem(
                     track = track,
-                    onClick = { playerViewModel.playTracks(state.tracks, state.tracks.indexOf(track)) }
+                    onClick = { playerViewModel.playTracks(state.tracks, state.tracks.indexOf(track)) },
+                    onMoreClick = { selectedTrackForActions = track }
                 )
             }
         }

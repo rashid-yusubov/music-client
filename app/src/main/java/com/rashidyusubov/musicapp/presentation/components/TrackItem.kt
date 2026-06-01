@@ -22,7 +22,8 @@ import com.rashidyusubov.musicapp.domain.model.Track
 @Composable
 fun TrackItem(
     track: Track,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onMoreClick: () -> Unit = {}
 ) {
     Surface(
         modifier = Modifier
@@ -35,6 +36,7 @@ fun TrackItem(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // ... (rest of the code remains same until IconButton)
             Box(
                 modifier = Modifier
                     .size(52.dp)
@@ -77,7 +79,7 @@ fun TrackItem(
                 )
             }
 
-            IconButton(onClick = { /* More actions */ }) {
+            IconButton(onClick = onMoreClick) {
                 Icon(
                     imageVector = Icons.Default.MoreHoriz,
                     contentDescription = null,

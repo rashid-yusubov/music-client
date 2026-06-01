@@ -20,8 +20,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.rashidyusubov.musicapp.domain.model.Track
+import com.rashidyusubov.musicapp.presentation.components.TrackActionsBottomSheet
 import com.rashidyusubov.musicapp.presentation.player.PlayerViewModel
 import com.rashidyusubov.musicapp.presentation.playlist.PlaylistsViewModel
+import com.rashidyusubov.musicapp.presentation.track.TrackActionsViewModel
 import com.rashidyusubov.musicapp.presentation.track.TrackDetailsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,69 +33,40 @@ fun FullPlayer(
     playerViewModel: PlayerViewModel,
     onMinimize: () -> Unit,
     trackDetailsViewModel: TrackDetailsViewModel = hiltViewModel(),
-    playlistsViewModel: PlaylistsViewModel = hiltViewModel()
+    playlistsViewModel: PlaylistsViewModel = hiltViewModel(),
+    trackActionsViewModel: TrackActionsViewModel = hiltViewModel()
 ) {
     val isPlaying by playerViewModel.isPlaying.collectAsState()
     val progress by playerViewModel.currentPosition.collectAsState()
     val duration by playerViewModel.duration.collectAsState()
     
     val trackState by trackDetailsViewModel.state.collectAsState()
-    val playlistsState by playlistsViewModel.state.collectAsState()
-    var showPlaylistSheet by remember { mutableStateOf(false) }
+    val playlists by trackActionsViewModel.playlists.collectAsState()
+    var showTrackActions by remember { mutableStateOf(false) }
 
     LaunchedEffect(track.id) {
         trackDetailsViewModel.loadTrack(track.id)
     }
 
-    if (showPlaylistSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showPlaylistSheet = false },
-            containerColor = MaterialTheme.colorScheme.surface,
-            tonalElevation = 8.dp
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "Добавить в плейлист",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(playlistsState.playlists) { playlist ->
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    playlistsViewModel.addTrackToPlaylist(playlist.id, track.id)
-                                    showPlaylistSheet = false
-                                },
-                            shape = RoundedCornerShape(12.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(Icons.Default.PlaylistPlay, contentDescription = null)
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Text(playlist.title, style = MaterialTheme.typography.bodyLarge)
-                            }
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(24.dp))
+    if (showTrackActions) {
+        TrackActionsBottomSheet(
+            track = track,
+            playlists = playlists,
+            isFavorite = trackActionsViewModel.isFavorite(track.id),
+            initialShowPlaylists = true,
+            onDismissRequest = { showTrackActions = false },
+            onFavoriteClick = { 
+                trackActionsViewModel.toggleFavorite(it)
+                trackDetailsViewModel.loadTrack(track.id) // Refresh local state
+            },
+            onAddToPlaylistClick = { t, pid ->
+                trackActionsViewModel.addTrackToPlaylist(t.id, pid)
             }
-        }
+        )
     }
     
     val sliderValue = if (duration > 0) progress.toFloat() / duration.toFloat() else 0f
+// ...
 
     Column(
         modifier = Modifier
@@ -171,7 +144,7 @@ fun FullPlayer(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { showPlaylistSheet = true }) {
+            IconButton(onClick = { showTrackActions = true }) {
                 Icon(
                     imageVector = Icons.Default.PlaylistAdd,
                     contentDescription = "Add to Playlist",

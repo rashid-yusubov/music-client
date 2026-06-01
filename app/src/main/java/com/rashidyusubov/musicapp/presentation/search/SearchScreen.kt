@@ -24,20 +24,42 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.rashidyusubov.musicapp.domain.model.Track
 import com.rashidyusubov.musicapp.presentation.components.EmptyContent
 import com.rashidyusubov.musicapp.presentation.components.ErrorContent
 import com.rashidyusubov.musicapp.presentation.components.LoadingContent
+import com.rashidyusubov.musicapp.presentation.components.TrackActionsBottomSheet
 import com.rashidyusubov.musicapp.presentation.components.TrackItem
 import com.rashidyusubov.musicapp.presentation.player.PlayerViewModel
+import com.rashidyusubov.musicapp.presentation.track.TrackActionsViewModel
 
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
-    playerViewModel: PlayerViewModel
+    playerViewModel: PlayerViewModel,
+    trackActionsViewModel: TrackActionsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val playlists by trackActionsViewModel.playlists.collectAsState()
+    val favorites by trackActionsViewModel.favorites.collectAsState()
+    
     var searchFocused by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    var selectedTrackForActions by remember { mutableStateOf<Track?>(null) }
+
+    if (selectedTrackForActions != null) {
+        TrackActionsBottomSheet(
+            track = selectedTrackForActions!!,
+            playlists = playlists,
+            isFavorite = trackActionsViewModel.isFavorite(selectedTrackForActions!!.id),
+            onDismissRequest = { selectedTrackForActions = null },
+            onFavoriteClick = { trackActionsViewModel.toggleFavorite(it) },
+            onAddToPlaylistClick = { track, playlistId ->
+                trackActionsViewModel.addTrackToPlaylist(track.id, playlistId)
+            }
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -45,6 +67,7 @@ fun SearchScreen(
             .background(MaterialTheme.colorScheme.background),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // ... (rest of the Column code)
         Text(
             text = "Поиск",
             style = MaterialTheme.typography.headlineLarge,
@@ -148,6 +171,9 @@ fun SearchScreen(
                         viewModel.saveTrackToHistory(track)
                         searchFocused = false
                         keyboardController?.hide()
+                    },
+                    onMoreClick = {
+                        selectedTrackForActions = track
                     }
                 )
             }
