@@ -215,7 +215,7 @@ fun MainNavigation() {
             }
 
             composable(BottomNavItem.Search.route) {
-                SearchScreen()
+                SearchScreen(playerViewModel = playerViewModel)
             }
 
             composable(BottomNavItem.Profile.route) {

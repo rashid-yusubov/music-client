@@ -33,6 +33,7 @@ import com.rashidyusubov.musicapp.presentation.player.PlayerViewModel
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
+    playerViewModel: PlayerViewModel
 ) {
     val state by viewModel.state.collectAsState()
     var searchFocused by remember { mutableStateOf(false) }
@@ -141,6 +142,7 @@ fun SearchScreen(
                 TrackItem(
                     track = track,
                     onClick = {
+                        playerViewModel.playTracks(state.tracks, state.tracks.indexOf(track))
                         viewModel.saveTrackToHistory(track)
                         searchFocused = false
                         keyboardController?.hide()
