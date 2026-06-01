@@ -42,15 +42,14 @@ fun SearchScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
+            .background(MaterialTheme.colorScheme.background),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
             text = "Поиск",
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
         )
 
         // Modern Search Bar
@@ -59,6 +58,7 @@ fun SearchScreen(
             onValueChange = { viewModel.updateQuery(it) },
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 16.dp)
                 .onFocusChanged { searchFocused = it.isFocused },
             placeholder = { Text("Треки, артисты или альбомы") },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
@@ -104,7 +104,9 @@ fun SearchScreen(
 
         if (searchFocused && state.history.isNotEmpty()) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -127,7 +129,7 @@ fun SearchScreen(
                             searchFocused = false
                             keyboardController?.hide()
                         }
-                        .padding(vertical = 12.dp),
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(Icons.Default.History, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(20.dp))
@@ -137,7 +139,7 @@ fun SearchScreen(
             }
         }
 
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(bottom = 0.dp)) {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(state.tracks) { track ->
                 TrackItem(
                     track = track,
