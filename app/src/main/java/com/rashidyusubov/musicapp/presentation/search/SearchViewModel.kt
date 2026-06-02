@@ -74,7 +74,7 @@ class SearchViewModel @Inject constructor(
                 val artistMap = artists.associateBy { it.id }
                 
                 val enrichedTracks = tracks.map { track ->
-                    track.copy(artistName = artistMap[track.artistId]?.name)
+                    track.copy(artistName = artistMap[track.artistId]?.name ?: track.artistName)
                 }
 
                 _state.value =

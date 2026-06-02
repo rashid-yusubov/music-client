@@ -39,7 +39,7 @@ class PlaylistDetailsViewModel @Inject constructor(
                 val artistMap = artists.associateBy { it.id }
                 
                 val enrichedTracks = tracks.map { track ->
-                    track.copy(artistName = artistMap[track.artistId]?.name)
+                    track.copy(artistName = artistMap[track.artistId]?.name ?: track.artistName)
                 }
                 
                 _state.value = _state.value.copy(tracks = enrichedTracks, isLoading = false)
