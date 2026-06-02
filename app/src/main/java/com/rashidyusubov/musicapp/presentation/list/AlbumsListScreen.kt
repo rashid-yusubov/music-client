@@ -9,10 +9,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rashidyusubov.musicapp.presentation.components.AlbumItem
+import com.rashidyusubov.musicapp.presentation.components.LoadingContent
 import com.rashidyusubov.musicapp.presentation.home.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,16 +38,23 @@ fun AlbumsListScreen(
             )
         }
     ) { padding ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            items(state.albums) { album ->
-                AlbumItem(
-                    album = album,
-                    onClick = { onAlbumClick(album.id) }
-                )
+            if (state.isLoading) {
+                LoadingContent()
+            }
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(state.albums) { album ->
+                    AlbumItem(
+                        album = album,
+                        onClick = { onAlbumClick(album.id) }
+                    )
+                }
             }
         }
     }

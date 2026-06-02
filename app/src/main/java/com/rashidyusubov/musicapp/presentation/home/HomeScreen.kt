@@ -16,6 +16,8 @@ import androidx.navigation.NavHostController
 import com.rashidyusubov.musicapp.domain.model.Track
 import com.rashidyusubov.musicapp.presentation.components.AlbumItem
 import com.rashidyusubov.musicapp.presentation.components.ArtistItem
+import com.rashidyusubov.musicapp.presentation.components.ErrorContent
+import com.rashidyusubov.musicapp.presentation.components.LoadingContent
 import com.rashidyusubov.musicapp.presentation.components.TrackActionsBottomSheet
 import com.rashidyusubov.musicapp.presentation.components.TrackItem
 import com.rashidyusubov.musicapp.presentation.player.PlayerViewModel
@@ -44,6 +46,11 @@ fun HomeScreen(
                 trackActionsViewModel.addTrackToPlaylist(track.id, pid)
             }
         )
+    }
+
+    if (state.isLoading) {
+        LoadingContent()
+        return
     }
 
     LazyColumn(

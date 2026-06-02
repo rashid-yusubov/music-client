@@ -9,10 +9,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.rashidyusubov.musicapp.presentation.components.LoadingContent
 import com.rashidyusubov.musicapp.presentation.components.TrackItem
 import com.rashidyusubov.musicapp.presentation.home.HomeViewModel
 import com.rashidyusubov.musicapp.presentation.player.PlayerViewModel
@@ -39,16 +41,23 @@ fun TracksListScreen(
             )
         }
     ) { padding ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            items(state.tracks) { track ->
-                TrackItem(
-                    track = track,
-                    onClick = { playerViewModel.playTracks(state.tracks, state.tracks.indexOf(track)) }
-                )
+            if (state.isLoading) {
+                LoadingContent()
+            }
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(state.tracks) { track ->
+                    TrackItem(
+                        track = track,
+                        onClick = { playerViewModel.playTracks(state.tracks, state.tracks.indexOf(track)) }
+                    )
+                }
             }
         }
     }

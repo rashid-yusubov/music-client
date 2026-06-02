@@ -31,7 +31,7 @@ class HomeViewModel @Inject constructor(
         loadContent()
     }
 
-    private fun loadContent() {
+    fun loadContent() {
 
         viewModelScope.launch {
 
