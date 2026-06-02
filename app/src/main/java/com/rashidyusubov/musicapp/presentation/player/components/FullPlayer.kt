@@ -1,9 +1,6 @@
 package com.rashidyusubov.musicapp.presentation.player.components
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -16,8 +13,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.Player
 import coil.compose.AsyncImage
 import com.rashidyusubov.musicapp.domain.model.Track
 import com.rashidyusubov.musicapp.presentation.components.TrackActionsBottomSheet
@@ -39,6 +36,8 @@ fun FullPlayer(
     val isPlaying by playerViewModel.isPlaying.collectAsState()
     val progress by playerViewModel.currentPosition.collectAsState()
     val duration by playerViewModel.duration.collectAsState()
+    val shuffleModeEnabled by playerViewModel.shuffleModeEnabled.collectAsState()
+    val repeatMode by playerViewModel.repeatMode.collectAsState()
     
     val trackState by trackDetailsViewModel.state.collectAsState()
     val playlists by trackActionsViewModel.playlists.collectAsState()
@@ -66,7 +65,6 @@ fun FullPlayer(
     }
     
     val sliderValue = if (duration > 0) progress.toFloat() / duration.toFloat() else 0f
-// ...
 
     Column(
         modifier = Modifier
@@ -74,11 +72,25 @@ fun FullPlayer(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        IconButton(
-            onClick = onMinimize,
-            modifier = Modifier.align(Alignment.Start)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Minimize", modifier = Modifier.size(32.dp))
+            IconButton(onClick = onMinimize) {
+                Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Minimize", modifier = Modifier.size(32.dp))
+            }
+            
+            Text(
+                text = "СЕЙЧАС ИГРАЕТ",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+            )
+
+            IconButton(onClick = { showTrackActions = true }) {
+                Icon(Icons.Default.MoreHoriz, contentDescription = "More", modifier = Modifier.size(32.dp))
+            }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -95,18 +107,34 @@ fun FullPlayer(
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        Text(
-            text = track.title,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1
-        )
-        Text(
-            text = track.artistName ?: "Исполнитель",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-            maxLines = 1
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = track.title,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
+                Text(
+                    text = track.artistName ?: "Исполнитель",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                    maxLines = 1
+                )
+            }
+            
+            IconButton(onClick = { trackDetailsViewModel.toggleFavorite() }) {
+                Icon(
+                    imageVector = if (trackState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = "Favorite",
+                    modifier = Modifier.size(32.dp),
+                    tint = if (trackState.isFavorite) Color.Red else LocalContentColor.current
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -144,11 +172,14 @@ fun FullPlayer(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { showTrackActions = true }) {
+            IconButton(
+                onClick = { playerViewModel.toggleShuffle() }
+            ) {
                 Icon(
-                    imageVector = Icons.Default.PlaylistAdd,
-                    contentDescription = "Add to Playlist",
-                    modifier = Modifier.size(32.dp)
+                    imageVector = Icons.Default.Shuffle,
+                    contentDescription = "Shuffle",
+                    tint = if (shuffleModeEnabled) MaterialTheme.colorScheme.primary else LocalContentColor.current.copy(alpha = 0.6f),
+                    modifier = Modifier.size(28.dp)
                 )
             }
 
@@ -172,12 +203,18 @@ fun FullPlayer(
                 Icon(Icons.Default.SkipNext, contentDescription = null, modifier = Modifier.size(48.dp))
             }
 
-            IconButton(onClick = { trackDetailsViewModel.toggleFavorite() }) {
+            IconButton(
+                onClick = { playerViewModel.toggleRepeat() }
+            ) {
+                val icon = when (repeatMode) {
+                    Player.REPEAT_MODE_ONE -> Icons.Default.RepeatOne
+                    else -> Icons.Default.Repeat
+                }
                 Icon(
-                    imageVector = if (trackState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = "Favorite",
-                    modifier = Modifier.size(32.dp),
-                    tint = if (trackState.isFavorite) Color.Red else LocalContentColor.current
+                    imageVector = icon,
+                    contentDescription = "Repeat",
+                    tint = if (repeatMode != Player.REPEAT_MODE_OFF) MaterialTheme.colorScheme.primary else LocalContentColor.current.copy(alpha = 0.6f),
+                    modifier = Modifier.size(28.dp)
                 )
             }
         }

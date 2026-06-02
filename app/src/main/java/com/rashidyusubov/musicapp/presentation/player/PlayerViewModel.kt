@@ -21,6 +21,8 @@ class PlayerViewModel @Inject constructor(
     val isPlaying = musicController.isPlaying
     val currentMediaItem = musicController.currentMediaItem
     val duration = musicController.duration
+    val shuffleModeEnabled = musicController.shuffleModeEnabled
+    val repeatMode = musicController.repeatMode
 
     private val _currentPosition = MutableStateFlow(0L)
     val currentPosition = _currentPosition.asStateFlow()
@@ -109,8 +111,15 @@ class PlayerViewModel @Inject constructor(
         _currentPosition.value = position
     }
 
+    fun toggleShuffle() {
+        musicController.toggleShuffle()
+    }
+
+    fun toggleRepeat() {
+        musicController.toggleRepeat()
+    }
+
     override fun onCleared() {
         super.onCleared()
-        // musicController.release() // Should we release here? Usually not if global
     }
 }

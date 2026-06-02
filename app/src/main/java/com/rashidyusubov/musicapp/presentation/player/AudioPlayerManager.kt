@@ -2,6 +2,7 @@ package com.rashidyusubov.musicapp.presentation.player
 
 import android.content.Context
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 
 class AudioPlayerManager(context: Context) {
@@ -42,12 +43,23 @@ class AudioPlayerManager(context: Context) {
     }
 
     fun resume() {
-
         player.play()
     }
 
-    fun isPlaying(): Boolean {
+    fun toggleShuffle() {
+        player.shuffleModeEnabled = !player.shuffleModeEnabled
+    }
 
+    fun toggleRepeat() {
+        player.repeatMode = when (player.repeatMode) {
+            Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+            Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+            Player.REPEAT_MODE_ONE -> Player.REPEAT_MODE_OFF
+            else -> Player.REPEAT_MODE_OFF
+        }
+    }
+
+    fun isPlaying(): Boolean {
         return player.isPlaying
     }
 
@@ -56,12 +68,10 @@ class AudioPlayerManager(context: Context) {
     }
 
     fun currentPosition(): Long {
-
         return player.currentPosition
     }
 
     fun duration(): Long {
-
         return player.duration
     }
 }

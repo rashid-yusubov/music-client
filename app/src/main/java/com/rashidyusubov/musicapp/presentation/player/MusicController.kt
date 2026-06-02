@@ -27,6 +27,12 @@ class MusicController(context: Context) {
     private val _duration = MutableStateFlow(0L)
     val duration = _duration.asStateFlow()
 
+    private val _shuffleModeEnabled = MutableStateFlow(false)
+    val shuffleModeEnabled = _shuffleModeEnabled.asStateFlow()
+
+    private val _repeatMode = MutableStateFlow(Player.REPEAT_MODE_OFF)
+    val repeatMode = _repeatMode.asStateFlow()
+
     init {
         val sessionToken = SessionToken(context, ComponentName(context, PlaybackService::class.java))
         controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
@@ -47,9 +53,19 @@ class MusicController(context: Context) {
                         _duration.value = mediaController?.duration ?: 0L
                     }
                 }
+
+                override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
+                    _shuffleModeEnabled.value = shuffleModeEnabled
+                }
+
+                override fun onRepeatModeChanged(repeatMode: Int) {
+                    _repeatMode.value = repeatMode
+                }
             })
             _isPlaying.value = mediaController?.isPlaying ?: false
             _currentMediaItem.value = mediaController?.currentMediaItem
+            _shuffleModeEnabled.value = mediaController?.shuffleModeEnabled ?: false
+            _repeatMode.value = mediaController?.repeatMode ?: Player.REPEAT_MODE_OFF
         }, MoreExecutors.directExecutor())
     }
 
@@ -87,6 +103,23 @@ class MusicController(context: Context) {
 
     fun seekTo(position: Long) {
         mediaController?.seekTo(position)
+    }
+
+    fun toggleShuffle() {
+        mediaController?.let {
+            it.shuffleModeEnabled = !it.shuffleModeEnabled
+        }
+    }
+
+    fun toggleRepeat() {
+        mediaController?.let {
+            it.repeatMode = when (it.repeatMode) {
+                Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+                Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+                Player.REPEAT_MODE_ONE -> Player.REPEAT_MODE_OFF
+                else -> Player.REPEAT_MODE_OFF
+            }
+        }
     }
 
     fun getCurrentPosition(): Long = mediaController?.currentPosition ?: 0L
