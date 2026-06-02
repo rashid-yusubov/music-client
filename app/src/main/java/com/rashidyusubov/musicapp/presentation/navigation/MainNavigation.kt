@@ -58,6 +58,7 @@ fun MainNavigation() {
     val isAuthorized = currentUser != null
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             if (isAuthorized) {
                 Column {

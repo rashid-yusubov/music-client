@@ -78,7 +78,8 @@ fun PlaylistDetailsScreen(
                     IconButton(onClick = { viewModel.deletePlaylist(playlistId) }) {
                         Icon(Icons.Default.Delete, contentDescription = "Удалить плейлист")
                     }
-                }
+                },
+                windowInsets = WindowInsets(0, 0, 0, 0)
             )
         }
     ) { padding ->

@@ -1,5 +1,6 @@
 package com.rashidyusubov.musicapp.presentation.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rashidyusubov.musicapp.presentation.components.AlbumItem
 import com.rashidyusubov.musicapp.presentation.components.LoadingContent
@@ -27,6 +29,7 @@ fun AlbumsListScreen(
     val state by viewModel.state.collectAsState()
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { Text("Все альбомы", fontWeight = FontWeight.Bold) },
@@ -34,7 +37,13 @@ fun AlbumsListScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, contentDescription = null)
                     }
-                }
+                },
+                windowInsets = WindowInsets(0, 0, 0, 0),
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+                )
             )
         }
     ) { padding ->
@@ -42,18 +51,21 @@ fun AlbumsListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             if (state.isLoading) {
                 LoadingContent()
-            }
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(state.albums) { album ->
-                    AlbumItem(
-                        album = album,
-                        onClick = { onAlbumClick(album.id) }
-                    )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(vertical = 8.dp)
+                ) {
+                    items(state.albums) { album ->
+                        AlbumItem(
+                            album = album,
+                            onClick = { onAlbumClick(album.id) }
+                        )
+                    }
                 }
             }
         }
